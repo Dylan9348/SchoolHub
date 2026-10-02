@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${NPGSQL_USER}
+      POSTGRES_PASSWORD: ${NPGSQL_PASSWORD}
+      POSTGRES_DB: ${NPGSQL_DATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${NPGSQL_USER} -d ${NPGSQL_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NPGSQL_USER: ${NPGSQL_USER}
+      NPGSQL_DATABASE: ${NPGSQL_DATABASE}
+      NPGSQL_PORT: ${NPGSQL_PORT}
+      NPGSQL_PASSWORD: ${NPGSQL_PASSWORD}
+      NPGSQL_HOST: ${NPGSQL_HOST}
+      
+      KEY_TOKEN_GEN: ${KEY_TOKEN_GEN}
+
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_FROMNAME: ${EMAIL_FROMNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+
+      CODE_HASH_SECRET: ${CODE_HASH_SECRET}
+    ports:
+      - "8081:8080"
+
+volumes:
+  pgdata:
