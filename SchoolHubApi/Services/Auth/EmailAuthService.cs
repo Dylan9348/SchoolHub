@@ -8,10 +8,9 @@ using SchoolHubApi.Validators;
 
 namespace SchoolHubApi.Services.Auth;
 
-public class EmailAuthService(IFluentEmail fluentEmail, PendingRegistrationValidator pendingValidator) : IEmailAuthService
+public class EmailAuthService(IFluentEmail fluentEmail) : IEmailAuthService
 {
     private readonly IFluentEmail _fluentEmail = fluentEmail;
-    private readonly PendingRegistrationValidator _pendingValidator = pendingValidator;
 
     private static string BuildEmailHtml(string title, string code, string disclaimerBold, string disclaimerRest)
     {
