@@ -54,7 +54,7 @@ public class UserRepository(Context database) : IUserRepository
         await _database.SaveChangesAsync();
     }
 
-    public async Task SavePendingUserAsync(string username, string email, string role, string password, string code, string token)
+    public async Task SavePendingUserAsync(string username, string email, string password, string role, string code, string token)
     {
         var secret = Environment.GetEnvironmentVariable("CODE_HASH_SECRET")
             ?? throw new InvalidOperationException("MISSING ENVIRONMENT VARIABLE: CODE_HASH_SECRET");
