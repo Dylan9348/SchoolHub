@@ -26,8 +26,8 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<SchoolHubUser>()
-            .HasDiscriminator<string>("UserRole")
-            .HasValue<StudentUser>("StudentUser")
-            .HasValue<TeacherUser>("TeacherUser");
+            .HasDiscriminator<UserRole>("UserRole")
+            .HasValue<StudentUser>(UserRole.Student)
+            .HasValue<TeacherUser>(UserRole.Teacher);
     }
 }

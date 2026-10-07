@@ -1,8 +1,8 @@
 
 namespace SchoolHubApi.Models.UserModels;
 
-public static class UserRole
+public enum UserRole
 {
-    public const string Student = "Student";
-    public const string Teacher = "Teacher";
+    Student,
+    Teacher
 }

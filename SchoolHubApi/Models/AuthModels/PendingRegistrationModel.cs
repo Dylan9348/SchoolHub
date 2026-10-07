@@ -1,10 +1,12 @@
 
+using SchoolHubApi.Models.UserModels;
+
 namespace SchoolHubApi.Models.AuthModels;
 
 public class PendingRegistration
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Role { get; set; } = "";
+    public UserRole Role { get; set; } = UserRole.Student;
     public string Token { get; set; } = "";
     public byte[] CodeHash { get; set; } = [];
     public string Email { get; set; } = "";
