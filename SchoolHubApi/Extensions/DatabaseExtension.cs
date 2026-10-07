@@ -22,4 +22,14 @@ public static class DatabaseExtension
 
         return services;
     }
+
+    public static IServiceProvider MigrateDatabase(this IServiceProvider services)
+    {
+        using (var scope = services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<Context>();
+            db.Database.Migrate();
+        }
+        return services;
+    }
 }
