@@ -14,6 +14,8 @@ builder.Services.AddExceptionHandlers();
 
 var app = builder.Build();
 
+app.Services.MigrateDatabase();
+
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
