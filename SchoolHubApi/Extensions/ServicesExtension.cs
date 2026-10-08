@@ -10,6 +10,7 @@ public static class ServicesExtension
         services.AddScoped<IEmailAuthService, EmailAuthService>();
         services.AddScoped<ITokenAuthService, TokenAuthService>();
         services.AddScoped<IUserRegistrationService, UserRegistrationService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }
