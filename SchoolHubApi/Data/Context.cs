@@ -27,6 +27,7 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
     {
         modelBuilder.Entity<SchoolHubUser>()
             .HasDiscriminator<UserRole>("UserRole")
+            .HasValue<SchoolHubUser>(UserRole.User)
             .HasValue<StudentUser>(UserRole.Student)
             .HasValue<TeacherUser>(UserRole.Teacher);
     }
