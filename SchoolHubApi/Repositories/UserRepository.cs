@@ -23,6 +23,13 @@ public class UserRepository(Context database) : IUserRepository
         return studentUser;
     }
 
+    public async Task<SchoolHubUser?> GetUserByUsernameAsync(string username)
+    {
+        var user = await _database.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+        return user;
+    }
+
     public async Task<PendingRegistration?> GetPendingRegistrationAsync(Guid id)
     {
         var user = await _database.PendingRegistrations.FindAsync(id);
@@ -54,7 +61,7 @@ public class UserRepository(Context database) : IUserRepository
         await _database.SaveChangesAsync();
     }
 
-    public async Task SavePendingUserAsync(string username, string email, string password, string role, string code, string token)
+    public async Task SavePendingUserAsync(string username, string email, string password, UserRole role, string code, string token)
     {
         var secret = Environment.GetEnvironmentVariable("CODE_HASH_SECRET")
             ?? throw new InvalidOperationException("MISSING ENVIRONMENT VARIABLE: CODE_HASH_SECRET");

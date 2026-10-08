@@ -11,14 +11,15 @@ builder.Services.AddValidators();
 builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddExceptionHandlers();
+builder.Services.AddJwt();
 
 var app = builder.Build();
 
 app.Services.MigrateDatabase();
 
 app.UseExceptionHandler();
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

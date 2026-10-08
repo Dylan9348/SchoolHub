@@ -7,6 +7,7 @@ namespace SchoolHubApi.Repositories;
 public interface IUserRepository
 {
     Task<StudentUser?> GetStudentUserByIdAsync(Guid id);
+    Task<SchoolHubUser?> GetUserByUsernameAsync(string username);
     Task<PendingRegistration?> GetPendingRegistrationAsync(Guid id);
     Task<PendingRegistration?> GetPendingRegistrationAsync(string token);
     Task SavePendingUserAsync(string username, string email, string password, UserRole role, string code, string token);
