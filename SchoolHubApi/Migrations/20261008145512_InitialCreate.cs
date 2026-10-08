@@ -12,22 +12,50 @@ namespace SchoolHubApi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "PendingRegistrations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    CodeHash = table.Column<byte[]>(type: "bytea", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Valid = table.Column<bool>(type: "boolean", nullable: false),
+                    Attempts = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PendingRegistrations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Token = table.Column<string>(type: "text", nullable: false),
+                    UserRole = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Expiration = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RefreshTokens", x => x.Id);
-                }
-            );
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Schools",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schools", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Teachers",
@@ -35,37 +63,20 @@ namespace SchoolHubApi.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Names = table.Column<string>(type: "text", nullable: false),
-                    LastNames = table.Column<string>(type: "text", nullable: false),
+                    LastNames = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teachers", x => x.Id);
-                }
-            );
-
-            migrationBuilder.CreateTable(
-                name: "TeacherUsers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Username = table.Column<string>(type: "text", nullable: false),
-                    Names = table.Column<string>(type: "text", nullable: false),
-                    LastNames = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeacherUsers", x => x.Id);
-                }
-            );
+                });
 
             migrationBuilder.CreateTable(
                 name: "TeacherReports",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TeacherId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Reason = table.Column<string>(type: "text", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,10 +85,8 @@ namespace SchoolHubApi.Migrations
                         name: "FK_TeacherReports_Teachers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
-                        principalColumn: "Id"
-                    );
-                }
-            );
+                        principalColumn: "Id");
+                });
 
             migrationBuilder.CreateTable(
                 name: "Classrooms",
@@ -85,38 +94,13 @@ namespace SchoolHubApi.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AverageGrade = table.Column<double>(type: "double precision", nullable: false),
-                    TeacherUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    StudentUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TeacherUserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classrooms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Classrooms_TeacherUsers_TeacherUserId",
-                        column: x => x.TeacherUserId,
-                        principalTable: "TeacherUsers",
-                        principalColumn: "Id"
-                    );
-                }
-            );
-
-            migrationBuilder.CreateTable(
-                name: "Schools",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TeacherUserId = table.Column<Guid>(type: "uuid", nullable: true),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Schools", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Schools_TeacherUsers_TeacherUserId",
-                        column: x => x.TeacherUserId,
-                        principalTable: "TeacherUsers",
-                        principalColumn: "Id"
-                    );
-                }
-            );
+                });
 
             migrationBuilder.CreateTable(
                 name: "Students",
@@ -126,7 +110,7 @@ namespace SchoolHubApi.Migrations
                     Names = table.Column<string>(type: "text", nullable: false),
                     LastNames = table.Column<string>(type: "text", nullable: false),
                     ClassroomId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AverageGrade = table.Column<double>(type: "double precision", nullable: false),
+                    AverageGrade = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,10 +120,8 @@ namespace SchoolHubApi.Migrations
                         column: x => x.ClassroomId,
                         principalTable: "Classrooms",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Subjects",
@@ -148,7 +130,7 @@ namespace SchoolHubApi.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TeacherId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClassroomId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AverageGrade = table.Column<double>(type: "double precision", nullable: false),
+                    AverageGrade = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -158,24 +140,21 @@ namespace SchoolHubApi.Migrations
                         column: x => x.ClassroomId,
                         principalTable: "Classrooms",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade
-                    );
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Subjects_Teachers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "StudentReports",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -184,10 +163,35 @@ namespace SchoolHubApi.Migrations
                         name: "FK_StudentReports_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
-                        principalColumn: "Id"
-                    );
-                }
-            );
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    UserRole = table.Column<int>(type: "integer", nullable: false),
+                    SelfId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TeacherUser_SelfId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Students_SelfId",
+                        column: x => x.SelfId,
+                        principalTable: "Students",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_Teachers_TeacherUser_SelfId",
+                        column: x => x.TeacherUser_SelfId,
+                        principalTable: "Teachers",
+                        principalColumn: "Id");
+                });
 
             migrationBuilder.CreateTable(
                 name: "Marks",
@@ -195,7 +199,7 @@ namespace SchoolHubApi.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubjectId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,17 +209,14 @@ namespace SchoolHubApi.Migrations
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade
-                    );
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Marks_Subjects_SubjectId",
                         column: x => x.SubjectId,
                         principalTable: "Subjects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Works",
@@ -227,7 +228,7 @@ namespace SchoolHubApi.Migrations
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Value = table.Column<int>(type: "integer", nullable: false),
                     SubjectId = table.Column<Guid>(type: "uuid", nullable: true),
-                    TeacherUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TeacherUserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -236,108 +237,140 @@ namespace SchoolHubApi.Migrations
                         name: "FK_Works_Subjects_SubjectId",
                         column: x => x.SubjectId,
                         principalTable: "Subjects",
-                        principalColumn: "Id"
-                    );
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Works_TeacherUsers_TeacherUserId",
+                        name: "FK_Works_Users_TeacherUserId",
                         column: x => x.TeacherUserId,
-                        principalTable: "TeacherUsers",
-                        principalColumn: "Id"
-                    );
-                }
-            );
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_StudentUserId",
+                table: "Classrooms",
+                column: "StudentUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classrooms_TeacherUserId",
                 table: "Classrooms",
-                column: "TeacherUserId"
-            );
+                column: "TeacherUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Marks_StudentId",
                 table: "Marks",
-                column: "StudentId"
-            );
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Marks_SubjectId",
                 table: "Marks",
-                column: "SubjectId"
-            );
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Schools_TeacherUserId",
-                table: "Schools",
-                column: "TeacherUserId"
-            );
+                column: "SubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentReports_StudentId",
                 table: "StudentReports",
-                column: "StudentId"
-            );
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_ClassroomId",
                 table: "Students",
-                column: "ClassroomId"
-            );
+                column: "ClassroomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_ClassroomId",
                 table: "Subjects",
-                column: "ClassroomId"
-            );
+                column: "ClassroomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_TeacherId",
                 table: "Subjects",
-                column: "TeacherId"
-            );
+                column: "TeacherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeacherReports_TeacherId",
                 table: "TeacherReports",
-                column: "TeacherId"
-            );
+                column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_SelfId",
+                table: "Users",
+                column: "SelfId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_TeacherUser_SelfId",
+                table: "Users",
+                column: "TeacherUser_SelfId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Works_SubjectId",
                 table: "Works",
-                column: "SubjectId"
-            );
+                column: "SubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Works_TeacherUserId",
                 table: "Works",
-                column: "TeacherUserId"
-            );
+                column: "TeacherUserId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Classrooms_Users_StudentUserId",
+                table: "Classrooms",
+                column: "StudentUserId",
+                principalTable: "Users",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Classrooms_Users_TeacherUserId",
+                table: "Classrooms",
+                column: "TeacherUserId",
+                principalTable: "Users",
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "Marks");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Classrooms_Users_StudentUserId",
+                table: "Classrooms");
 
-            migrationBuilder.DropTable(name: "RefreshTokens");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Classrooms_Users_TeacherUserId",
+                table: "Classrooms");
 
-            migrationBuilder.DropTable(name: "Schools");
+            migrationBuilder.DropTable(
+                name: "Marks");
 
-            migrationBuilder.DropTable(name: "StudentReports");
+            migrationBuilder.DropTable(
+                name: "PendingRegistrations");
 
-            migrationBuilder.DropTable(name: "TeacherReports");
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
-            migrationBuilder.DropTable(name: "Works");
+            migrationBuilder.DropTable(
+                name: "Schools");
 
-            migrationBuilder.DropTable(name: "Students");
+            migrationBuilder.DropTable(
+                name: "StudentReports");
 
-            migrationBuilder.DropTable(name: "Subjects");
+            migrationBuilder.DropTable(
+                name: "TeacherReports");
 
-            migrationBuilder.DropTable(name: "Classrooms");
+            migrationBuilder.DropTable(
+                name: "Works");
 
-            migrationBuilder.DropTable(name: "Teachers");
+            migrationBuilder.DropTable(
+                name: "Subjects");
 
-            migrationBuilder.DropTable(name: "TeacherUsers");
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Teachers");
+
+            migrationBuilder.DropTable(
+                name: "Classrooms");
         }
     }
 }

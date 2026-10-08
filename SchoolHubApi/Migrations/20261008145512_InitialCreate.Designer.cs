@@ -12,7 +12,7 @@ using SchoolHubApi.Data;
 namespace SchoolHubApi.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20260923123503_InitialCreate")]
+    [Migration("20261008145512_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,49 @@ namespace SchoolHubApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SchoolHubApi.Models.AuthModels.PendingRegistration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Valid")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PendingRegistrations");
+                });
 
             modelBuilder.Entity("SchoolHubApi.Models.AuthModels.RefreshToken", b =>
                 {
@@ -41,6 +84,10 @@ namespace SchoolHubApi.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("UserRole")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("RefreshTokens");
@@ -55,10 +102,15 @@ namespace SchoolHubApi.Migrations
                     b.Property<double>("AverageGrade")
                         .HasColumnType("double precision");
 
+                    b.Property<Guid?>("StudentUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("TeacherUserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
 
                     b.HasIndex("TeacherUserId");
 
@@ -92,12 +144,7 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("TeacherUserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TeacherUserId");
 
                     b.ToTable("Schools");
                 });
@@ -194,6 +241,10 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid?>("TeacherId")
                         .HasColumnType("uuid");
 
@@ -237,7 +288,7 @@ namespace SchoolHubApi.Migrations
                     b.ToTable("Works");
                 });
 
-            modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -247,17 +298,12 @@ namespace SchoolHubApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastNames")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Names")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("UserRole")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -265,11 +311,49 @@ namespace SchoolHubApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TeacherUsers");
+                    b.ToTable("Users");
+
+                    b.HasDiscriminator<int>("UserRole").HasValue(0);
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
+                {
+                    b.HasBaseType("SchoolHubApi.Models.UserModels.SchoolHubUser");
+
+                    b.Property<Guid?>("SelfId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("SelfId");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
+                {
+                    b.HasBaseType("SchoolHubApi.Models.UserModels.SchoolHubUser");
+
+                    b.Property<Guid?>("SelfId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("SelfId");
+
+                    b.ToTable("Users", t =>
+                        {
+                            t.Property("SelfId")
+                                .HasColumnName("TeacherUser_SelfId");
+                        });
+
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.Classroom", b =>
                 {
+                    b.HasOne("SchoolHubApi.Models.UserModels.StudentUser", null)
+                        .WithMany("Classrooms")
+                        .HasForeignKey("StudentUserId");
+
                     b.HasOne("SchoolHubApi.Models.UserModels.TeacherUser", null)
                         .WithMany("Classrooms")
                         .HasForeignKey("TeacherUserId");
@@ -292,13 +376,6 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.School", b =>
-                {
-                    b.HasOne("SchoolHubApi.Models.UserModels.TeacherUser", null)
-                        .WithMany("Schools")
-                        .HasForeignKey("TeacherUserId");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.Student", b =>
@@ -356,6 +433,24 @@ namespace SchoolHubApi.Migrations
                         .HasForeignKey("TeacherUserId");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
+                {
+                    b.HasOne("SchoolHubApi.Models.SchoolModels.Student", "Self")
+                        .WithMany()
+                        .HasForeignKey("SelfId");
+
+                    b.Navigation("Self");
+                });
+
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
+                {
+                    b.HasOne("SchoolHubApi.Models.SchoolModels.Teacher", "Self")
+                        .WithMany()
+                        .HasForeignKey("SelfId");
+
+                    b.Navigation("Self");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.Classroom", b =>
                 {
                     b.Navigation("Students");
@@ -380,11 +475,14 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Subjects");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
+                {
+                    b.Navigation("Classrooms");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
                 {
                     b.Navigation("Classrooms");
-
-                    b.Navigation("Schools");
 
                     b.Navigation("Works");
                 });

@@ -46,9 +46,8 @@ namespace SchoolHubApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -300,10 +299,8 @@ namespace SchoolHubApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserRole")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("character varying(13)");
+                    b.Property<int>("UserRole")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -313,7 +310,7 @@ namespace SchoolHubApi.Migrations
 
                     b.ToTable("Users");
 
-                    b.HasDiscriminator<string>("UserRole").HasValue("SchoolHubUser");
+                    b.HasDiscriminator<int>("UserRole").HasValue(0);
 
                     b.UseTphMappingStrategy();
                 });
@@ -327,7 +324,7 @@ namespace SchoolHubApi.Migrations
 
                     b.HasIndex("SelfId");
 
-                    b.HasDiscriminator().HasValue("StudentUser");
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
@@ -345,7 +342,7 @@ namespace SchoolHubApi.Migrations
                                 .HasColumnName("TeacherUser_SelfId");
                         });
 
-                    b.HasDiscriminator().HasValue("TeacherUser");
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.Classroom", b =>
