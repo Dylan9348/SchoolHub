@@ -1,6 +1,5 @@
 
 using SchoolHubApi.DTOs;
-using SchoolHubApi.Models.AuthModels;
 using SchoolHubApi.Models.UserModels;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Validators;
