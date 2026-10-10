@@ -1,6 +1,6 @@
 
 using Microsoft.AspNetCore.Diagnostics;
-using SchoolHubApi.Models.Exceptions;
+using SchoolHubApi.Exceptions;
 
 namespace SchoolHubApi.Handlers;
 
