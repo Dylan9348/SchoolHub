@@ -2,7 +2,7 @@
 using SchoolHubApi.Models.Languages;
 
 using FluentEmail.Core;
-using SchoolHubApi.Models.Exceptions;
+using SchoolHubApi.Exceptions;
 using System.Net;
 using SchoolHubApi.Validators;
 

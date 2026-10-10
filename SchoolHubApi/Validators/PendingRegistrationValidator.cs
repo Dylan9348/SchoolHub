@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using SchoolHubApi.Data;
 using SchoolHubApi.Models.AuthModels;
-using SchoolHubApi.Models.Exceptions;
+using SchoolHubApi.Exceptions;
 using SchoolHubApi.Validators.ValidationResult;
 using SchoolHubApi.Repositories;
 
