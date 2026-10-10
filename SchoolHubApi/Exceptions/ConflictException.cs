@@ -1,3 +1,4 @@
-namespace SchoolHubApi.Models.Exceptions;
+
+namespace SchoolHubApi.Exceptions;
 
 public class ConflicException(string message) : SchoolHubException(message);

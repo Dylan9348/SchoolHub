@@ -1,3 +1,4 @@
-namespace SchoolHubApi.Models.Exceptions;
+
+namespace SchoolHubApi.Exceptions;
 
 public abstract class SchoolHubException(string message) : Exception(message);
