@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
 using SchoolHubApi.Models.Languages;
-using SchoolHubApi.Models.ValidationResultModels;
+using SchoolHubApi.Validators.ValidationResult;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Services.Auth;
 using SchoolHubApi.Validators;

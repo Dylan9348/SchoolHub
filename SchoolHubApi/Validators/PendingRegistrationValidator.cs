@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolHubApi.Data;
 using SchoolHubApi.Models.AuthModels;
 using SchoolHubApi.Models.Exceptions;
-using SchoolHubApi.Models.ValidationResultModels;
+using SchoolHubApi.Validators.ValidationResult;
 using SchoolHubApi.Repositories;
 
 namespace SchoolHubApi.Validators;

@@ -1,5 +1,5 @@
 
-namespace SchoolHubApi.Models.ValidationResultModels;
+namespace SchoolHubApi.Validators.ValidationResult;
 
 public class FailedValidationResult<VT, WT>(VT validatedObject, WT wrongValue, string? message = null) : ValidationResult<VT>(validatedObject)
 {

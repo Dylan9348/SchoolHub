@@ -1,5 +1,5 @@
 
-namespace SchoolHubApi.Models.ValidationResultModels;
+namespace SchoolHubApi.Validators.ValidationResult;
 
 public abstract class ValidationResult<T>(T validatedObject)
 {
