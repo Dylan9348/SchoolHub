@@ -1,6 +1,6 @@
 namespace SchoolHubApi.Models.SchoolModels.Permissions;
 
-public enum TablePermission
+public enum TableRole
 {
     Owner,
     Admin,
