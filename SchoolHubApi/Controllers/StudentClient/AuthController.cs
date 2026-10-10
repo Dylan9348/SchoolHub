@@ -29,23 +29,11 @@ public class AuthStudentController(
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn([FromBody] CreateStudentUserDto req, [FromQuery] string language = SupportedLanguages.English)
     {
-        try{
-        try
-        {
-            var token = await _userRegistrationService.RegisterStudentUser(req, language);
-            if (token is null)
-                return Created();
+        var token = await _userRegistrationService.RegisterStudentUser(req, language);
+        if (token is null)
+            return Created();
 
-            return Ok(token);
-        }
-        catch (LanguageNotSupportedException)
-        {
-            return BadRequest($"invalid language {language}");
-        }}
-        catch(Exception e)
-        {
-            return UnprocessableEntity(e.Message);
-        }
+        return Ok(token);
     }
 
     [HttpPost("signin/verify-email/{code}")]
