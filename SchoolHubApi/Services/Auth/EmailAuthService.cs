@@ -1,16 +1,24 @@
 
-using SchoolHubApi.Models.Languages;
+using SchoolHubApi.Enums;
 
 using FluentEmail.Core;
 using SchoolHubApi.Exceptions;
 using System.Net;
-using SchoolHubApi.Validators;
 
 namespace SchoolHubApi.Services.Auth;
 
 public class EmailAuthService(IFluentEmail fluentEmail) : IEmailAuthService
 {
     private readonly IFluentEmail _fluentEmail = fluentEmail;
+
+    public const string SpanishSubject = "SchoolHub: Verifica tu correo.";
+    public const string EnglishSubject = "SchoolHub: Verify your email.";
+
+    public const string EnglishDisBold = "Didn't you request this? ";
+    public const string SpanishDisBold = "No solicitaste este correo?";
+    
+    public const string EnglishDisclaimer = "You can safely ignore this email";
+    public const string SpanishDisclaimer = "Ignóralo";
 
     private static string BuildEmailHtml(string title, string code, string disclaimerBold, string disclaimerRest)
     {
@@ -63,12 +71,12 @@ public class EmailAuthService(IFluentEmail fluentEmail) : IEmailAuthService
         """;
     }
 
-    public async Task<bool> SendVerificationMailAsync(string email, string language, string code)
+    public async Task<bool> SendVerificationMailAsync(string email, Language language, string code)
     {
         var (subject, boldDisclaimer, disclaimer) = language switch
         {
-            SupportedLanguages.Spanish => (SendVerificationMailResponses.SpanishSubject, SendVerificationMailResponses.SpanishDisBold, SendVerificationMailResponses.SpanishDisclaimer),
-            SupportedLanguages.English => (SendVerificationMailResponses.EnglishSubject, SendVerificationMailResponses.EnglishDisBold, SendVerificationMailResponses.EnglishDisclaimer),
+            Language.Spanish => (SpanishSubject, SpanishDisBold, SpanishDisclaimer),
+            Language.English => (EnglishSubject, EnglishDisBold, EnglishDisclaimer),
             _ => throw new LanguageNotSupportedException(language)
         };
 

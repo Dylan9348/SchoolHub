@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
-using SchoolHubApi.Models.Languages;
+using SchoolHubApi.Enums;
 using SchoolHubApi.Validators.ValidationResult;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Services.Auth;
@@ -24,7 +24,7 @@ public class AuthStudentController(
     private readonly IUserRepository _userRepository = userRepository;
 
     [HttpPost("signin")]
-    public async Task<IActionResult> SignIn([FromBody] CreateStudentUserDto req, [FromQuery] string language = SupportedLanguages.English)
+    public async Task<IActionResult> SignIn([FromBody] CreateStudentUserDto req, [FromQuery] Language language = Language.English)
     {
         var token = await _userRegistrationService.RegisterStudentUser(req, language);
         if (token is null)
