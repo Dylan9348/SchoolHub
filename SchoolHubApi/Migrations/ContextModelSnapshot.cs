@@ -296,9 +296,14 @@ namespace SchoolHubApi.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("StudentUserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("StudentUserId");
 
                     b.ToTable("Tables");
                 });
@@ -532,6 +537,10 @@ namespace SchoolHubApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SchoolHubApi.Models.UserModels.StudentUser", null)
+                        .WithMany("Tables")
+                        .HasForeignKey("StudentUserId");
+
                     b.Navigation("Owner");
                 });
 
@@ -609,6 +618,8 @@ namespace SchoolHubApi.Migrations
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
                 {
                     b.Navigation("Classrooms");
+
+                    b.Navigation("Tables");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
