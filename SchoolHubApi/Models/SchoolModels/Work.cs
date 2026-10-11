@@ -1,6 +1,6 @@
 namespace SchoolHubApi.Models.SchoolModels;
 
-public class Work
+public class SchoolWork
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public bool IsHomework { get; set; } = false;

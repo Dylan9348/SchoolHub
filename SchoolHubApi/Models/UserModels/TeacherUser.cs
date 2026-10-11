@@ -6,5 +6,5 @@ public class TeacherUser : SchoolHubUser
 {
     public Teacher? Self { get; set; }
     public ICollection<Classroom> Classrooms { get; set; } = [];
-    public ICollection<Work> Works { get; set; } = [];
+    public ICollection<SchoolWork> Works { get; set; } = [];
 }
