@@ -119,4 +119,10 @@ public class UserRepository(Context database) : IUserRepository
 
         return true;
     }
+
+    public async Task<SchoolHubUser?> GetUserByIdAsync(Guid id) => 
+        await _database.Users.FindAsync(id);
+    
+    public async Task<bool> UserExistAsync(Guid id) =>
+        await _database.Users.AnyAsync(u => u.Id == id);
 }

@@ -1,5 +1,6 @@
 
 using SchoolHubApi.DTOs;
+using SchoolHubApi.Enums;
 using SchoolHubApi.Models.UserModels;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Validators;
@@ -17,7 +18,7 @@ public class UserRegistrationService(
     private readonly IEmailAuthService _emailService = emailAuthService;
     private readonly PendingRegistrationValidator _pendingRegistrationValidator = pendingRegistrationValidator;
 
-    public async Task<string> StartRegisterWithEmailAsync(string username, string password, string email, UserRole role, string language)
+    public async Task<string> StartRegisterWithEmailAsync(string username, string password, string email, UserRole role, Language language)
     {
         var code = _tokenService.GenerateSecureRandomString(6);
         var token = _tokenService.GenerateSecureRandomString(10);
@@ -45,7 +46,7 @@ public class UserRegistrationService(
         await _userRepository.SaveStudentUserWithoutEmailAsync(username, password);
     }
 
-    public async Task<string?> RegisterStudentUser(CreateStudentUserDto student, string language)
+    public async Task<string?> RegisterStudentUser(CreateStudentUserDto student, Language language)
     {
         if (student.Email is null)
             await RegisterStudentUserWithoutEmailAsync(student.Username, student.Password);
