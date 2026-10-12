@@ -7,6 +7,7 @@ namespace SchoolHubApi.Models.TableModels;
 public class Table
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "";
     public Guid OwnerId { get; set; }
     public SchoolHubUser Owner { get; set; } = null!;
     public ICollection<TableWork> Works { get; set; } = [];

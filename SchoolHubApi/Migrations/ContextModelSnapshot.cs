@@ -143,7 +143,12 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SchoolHubUserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SchoolHubUserId");
 
                     b.ToTable("Schools");
                 });
@@ -293,17 +298,17 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<Guid?>("StudentUserId")
+                    b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
-
-                    b.HasIndex("StudentUserId");
+                    b.HasIndex("OwnerId", "Name")
+                        .IsUnique();
 
                     b.ToTable("Tables");
                 });
@@ -317,7 +322,7 @@ namespace SchoolHubApi.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("TableId")
+                    b.Property<Guid>("TableId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
@@ -325,9 +330,10 @@ namespace SchoolHubApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TableId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("TableId", "UserId")
+                        .IsUnique();
 
                     b.ToTable("TableMember");
                 });
@@ -474,6 +480,13 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.School", b =>
+                {
+                    b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", null)
+                        .WithMany("Schools")
+                        .HasForeignKey("SchoolHubUserId");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.SchoolWork", b =>
                 {
                     b.HasOne("SchoolHubApi.Models.SchoolModels.Subject", null)
@@ -532,29 +545,29 @@ namespace SchoolHubApi.Migrations
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
                 {
                     b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "Owner")
-                        .WithMany()
+                        .WithMany("OwnTables")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("SchoolHubApi.Models.UserModels.StudentUser", null)
-                        .WithMany("Tables")
-                        .HasForeignKey("StudentUserId");
 
                     b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.TableMember", b =>
                 {
-                    b.HasOne("SchoolHubApi.Models.TableModels.Table", null)
+                    b.HasOne("SchoolHubApi.Models.TableModels.Table", "Table")
                         .WithMany("Members")
-                        .HasForeignKey("TableId");
+                        .HasForeignKey("TableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "User")
-                        .WithMany()
+                        .WithMany("Memberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Table");
 
                     b.Navigation("User");
                 });
@@ -615,11 +628,18 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Works");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>
+                {
+                    b.Navigation("Memberships");
+
+                    b.Navigation("OwnTables");
+
+                    b.Navigation("Schools");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
                 {
                     b.Navigation("Classrooms");
-
-                    b.Navigation("Tables");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>

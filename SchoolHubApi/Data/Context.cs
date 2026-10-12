@@ -40,5 +40,31 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .HasDiscriminator<WorkType>("WorkType")
             .HasValue<TableInstructions>(WorkType.Instructions)
             .HasValue<TableQuiz>(WorkType.Quiz);
+        
+        modelBuilder.Entity<Table>()
+            .HasOne(t => t.Owner)
+            .WithMany(u => u.OwnTables)
+            .HasForeignKey(t => t.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<TableMember>()
+            .HasOne(m => m.Table)
+            .WithMany(t => t.Members)
+            .HasForeignKey(m => m.TableId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TableMember>()
+            .HasOne(m => m.User)
+            .WithMany(u => u.Memberships)
+            .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TableMember>()
+            .HasIndex(m => new { m.TableId, m.UserId })
+            .IsUnique();
+        
+        modelBuilder.Entity<Table>()
+            .HasIndex(t => new { t.OwnerId, t.Name })
+            .IsUnique();
     }
 }
