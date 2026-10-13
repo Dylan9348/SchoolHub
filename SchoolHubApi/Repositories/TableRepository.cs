@@ -36,6 +36,9 @@ public class TableRepository(Context database) : ITableRepository
         return table.Id;
     }
 
-    public async Task<Table?> GetTable(string? owner, string? tableName) =>
-        await _database.Tables.FirstOrDefaultAsync(t => t.Owner.Username == owner && t.Name == tableName);
+    public async Task<Table?> GetTableAsync(string owner, string tableName) =>
+        await _database.Tables
+            .AsNoTracking()
+            .Include(t => t.Owner)
+            .SingleOrDefaultAsync(t => t.Owner.Username == owner && t.Name == tableName);
 }
