@@ -10,6 +10,6 @@ public class Table
     public string Name { get; set; } = "";
     public Guid OwnerId { get; set; }
     public SchoolHubUser Owner { get; set; } = null!;
-    public ICollection<TableWork> Works { get; set; } = [];
+    public ICollection<Category> Categories { get; set; } = [];
     public ICollection<TableMember> Members { get; set; } = [];
 }
