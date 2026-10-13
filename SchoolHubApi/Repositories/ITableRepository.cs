@@ -9,5 +9,5 @@ public interface ITableRepository
     Task<Table?> GetTableByIdAsync(Guid id);
     Task<bool> OwnerHasTableNamedAsync(Guid ownerId, string tableName);
     Task<Guid> CreateTableAsync(Guid userId, string tableName);
-    Task<Table?> GetTable(string owner, string tableName);
+    Task<Table?> GetTableAsync(string owner, string tableName);
 }

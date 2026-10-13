@@ -60,7 +60,7 @@ public class TableController(
         var table = await _tableRepository.GetTableByIdAsync(tableId);
 
         if (table is null)
-            return NotFound(tableId);
+            return NotFound();
         
         return Ok(table.ToDto());
     }
@@ -68,10 +68,10 @@ public class TableController(
     [HttpGet]
     public async Task<IActionResult> SearchTable([FromQuery] SearchTableDto req)
     {
-        var table = await _tableRepository.GetTable(req.OwnerName, req.TableName);
+        var table = await _tableRepository.GetTableAsync(req.OwnerName, req.TableName);
 
         if (table is null)
-            return NotFound(req);
+            return NotFound();
         
         return Ok(table.ToDto());
     }
