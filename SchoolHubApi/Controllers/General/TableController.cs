@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
+using SchoolHubApi.Extensions;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Validators;
 using SchoolHubApi.Validators.ValidationResult;
@@ -23,7 +24,7 @@ public class TableController(
     private readonly TableValidator _tableValidator = tableValidator;
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateTable(CreateTableDto req)
+    public async Task<IActionResult> CreateTable([FromBody] CreateTableDto req)
     {
         var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -50,6 +51,28 @@ public class TableController(
 
         var tableId = await _tableRepository.CreateTableAsync(userId, req.TableName);
 
-        return Created($"/table/{tableId}", new { id = tableId });
+        return Created(nameof(GetTable), new { id = tableId });
+    }
+
+    [HttpGet("{tableId:guid}")]
+    public async Task<IActionResult> GetTable([FromRoute] Guid tableId)
+    {
+        var table = await _tableRepository.GetTableByIdAsync(tableId);
+
+        if (table is null)
+            return NotFound(tableId);
+        
+        return Ok(table.ToDto());
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> SearchTable([FromBody] SearchTableDto req)
+    {
+        var table = await _tableRepository.GetTable(req.OwnerName, req.TableName);
+
+        if (table is null)
+            return NotFound(req);
+        
+        return Ok(table.ToDto());
     }
 }
