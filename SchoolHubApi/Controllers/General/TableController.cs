@@ -66,7 +66,7 @@ public class TableController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchTable([FromBody] SearchTableDto req)
+    public async Task<IActionResult> SearchTable([FromQuery] SearchTableDto req)
     {
         var table = await _tableRepository.GetTable(req.OwnerName, req.TableName);
 
