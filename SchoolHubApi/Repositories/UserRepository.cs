@@ -91,7 +91,7 @@ public class UserRepository(Context database) : IUserRepository
         _database.Add(pending);
         await _database.SaveChangesAsync();
     }
-    public async Task<bool> AcceptPendingUserAsync(string token)
+    public async Task AcceptPendingUserAsync(string token)
     {
         var pending = await _database.PendingRegistrations.FirstOrDefaultAsync(p => p.Token == token)
             ?? throw new NotFoundException("Pending register not found");
@@ -116,8 +116,6 @@ public class UserRepository(Context database) : IUserRepository
         
         _database.Add(user);
         await _database.SaveChangesAsync();
-
-        return true;
     }
 
     public async Task<SchoolHubUser?> GetUserByIdAsync(Guid id) => 

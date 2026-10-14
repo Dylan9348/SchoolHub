@@ -33,10 +33,10 @@ public class UserRegistrationService(
     {
         var isValid = await _pendingRegistrationValidator.ValidateCodeAsync(token, code);
 
-        var accepted = await _userRepository.AcceptPendingUserAsync(token);
-
-        if (!isValid | !accepted)
+        if (!isValid)
             return false;
+
+        await _userRepository.AcceptPendingUserAsync(token);
 
         return true;
     }

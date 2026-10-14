@@ -13,6 +13,6 @@ public interface IUserRepository
     Task<PendingRegistration?> GetPendingRegistrationAsync(Guid id);
     Task<PendingRegistration?> GetPendingRegistrationAsync(string token);
     Task SavePendingUserAsync(string username, string email, string password, UserRole role, string code, string token);
-    Task<bool> AcceptPendingUserAsync(string pendingId);
+    Task AcceptPendingUserAsync(string pendingId);
     Task SaveStudentUserWithoutEmailAsync(string username, string password);
 }
