@@ -3,10 +3,11 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
+using SchoolHubApi.Enums;
 using SchoolHubApi.Extensions;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Validators;
-using SchoolHubApi.Validators.ValidationResult;
+using SchoolHubApi.Validators.ValidationResults;
 
 namespace SchoolHubApi.Controllers.Tables;
 
@@ -38,12 +39,12 @@ public class TableController(
         
         var result = await _tableValidator.ValidateTableCreationAsync(userId, req.TableName);
 
-        if (result is FailedValidationResult<object?, string> failedResult)
+        if (result is FailedValidationResult failedResult)
         {
-            if (failedResult.Message == "too short")
+            if (failedResult.Type == FailedValidationType.TooShort)
                 return BadRequest("Table name is too short. It must be 2 chars of length at least");
             
-            if (failedResult.Message == "too long")
+            if (failedResult.Type == FailedValidationType.TooLong)
                 return BadRequest("Table name is too long. It must be 50 chars of length at most");
             
             return Conflict(failedResult.Message);

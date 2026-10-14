@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
 using SchoolHubApi.Enums;
-using SchoolHubApi.Validators.ValidationResult;
+using SchoolHubApi.Validators.ValidationResults;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Services.Auth;
 using SchoolHubApi.Validators;
@@ -38,8 +38,8 @@ public class AuthStudentController(
     {
         var isValid = await _pendingValidator.IsValid(token);
 
-        if (isValid is FailedValidationResult<string, object?>)
-            return BadRequest($"invalid token");
+        if (isValid is FailedValidationResult failedResult)
+            return BadRequest(new { type = failedResult.Type, message = failedResult.Message });
 
         var finished = await _userRegistrationService.VerifyAndFinishAsync(token, code);
 
