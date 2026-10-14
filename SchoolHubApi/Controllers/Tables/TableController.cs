@@ -8,7 +8,7 @@ using SchoolHubApi.Repositories;
 using SchoolHubApi.Validators;
 using SchoolHubApi.Validators.ValidationResult;
 
-namespace SchoolHubApi.Controllers.General;
+namespace SchoolHubApi.Controllers.Tables;
 
 [ApiController]
 [Route("[controller]")]
