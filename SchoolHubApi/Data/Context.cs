@@ -27,6 +27,7 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
     public DbSet<SchoolWork> Works => Set<SchoolWork>();
 
     public DbSet<Table> Tables => Set<Table>();
+    public DbSet<TableMember> TableMembers => Set<TableMember>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

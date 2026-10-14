@@ -159,6 +159,9 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -178,6 +181,8 @@ namespace SchoolHubApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("SubjectId");
 
@@ -292,6 +297,26 @@ namespace SchoolHubApi.Migrations
                     b.ToTable("TeacherReports");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TableId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TableId");
+
+                    b.ToTable("Category");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
                 {
                     b.Property<Guid>("Id")
@@ -335,7 +360,7 @@ namespace SchoolHubApi.Migrations
                     b.HasIndex("TableId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("TableMember");
+                    b.ToTable("TableMembers");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Works.TableWork", b =>
@@ -347,9 +372,6 @@ namespace SchoolHubApi.Migrations
                     b.Property<DateOnly?>("Date")
                         .HasColumnType("date");
 
-                    b.Property<Guid?>("TableId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -358,8 +380,6 @@ namespace SchoolHubApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TableId");
 
                     b.ToTable("TableWork");
 
@@ -489,6 +509,10 @@ namespace SchoolHubApi.Migrations
 
             modelBuilder.Entity("SchoolHubApi.Models.SchoolModels.SchoolWork", b =>
                 {
+                    b.HasOne("SchoolHubApi.Models.TableModels.Category", null)
+                        .WithMany("Works")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("SchoolHubApi.Models.SchoolModels.Subject", null)
                         .WithMany("Works")
                         .HasForeignKey("SubjectId");
@@ -542,6 +566,17 @@ namespace SchoolHubApi.Migrations
                         .HasForeignKey("TeacherId");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.Category", b =>
+                {
+                    b.HasOne("SchoolHubApi.Models.TableModels.Table", "Table")
+                        .WithMany("Categories")
+                        .HasForeignKey("TableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Table");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
                 {
                     b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "Owner")
@@ -570,13 +605,6 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Table");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SchoolHubApi.Models.TableModels.Works.TableWork", b =>
-                {
-                    b.HasOne("SchoolHubApi.Models.TableModels.Table", null)
-                        .WithMany("Works")
-                        .HasForeignKey("TableId");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
@@ -621,11 +649,16 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Subjects");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.Category", b =>
+                {
+                    b.Navigation("Works");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
                 {
-                    b.Navigation("Members");
+                    b.Navigation("Categories");
 
-                    b.Navigation("Works");
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>
