@@ -47,6 +47,10 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .WithMany(u => u.OwnTables)
             .HasForeignKey(t => t.OwnerId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<TableMember>()
+            .HasIndex(m => new { m.TableId, m.UserId })
+            .IsUnique();
 
         modelBuilder.Entity<TableMember>()
             .HasOne(m => m.Table)
