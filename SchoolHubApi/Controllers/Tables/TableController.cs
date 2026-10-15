@@ -25,17 +25,17 @@ public class TableController(
     private readonly TableValidator _tableValidator = tableValidator;
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateTable([FromBody] CreateTableDto req)
+    public async Task<IActionResult> CreateTable([FromBody] CreateTableDto req, CancellationToken ct)
     {
         var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!Guid.TryParse(userStringId, out var userId))
             return Unauthorized("Invalid Claim");
 
-        var userExists = await _userRepository.UserExistAsync(userId);
+        var userExists = await _userRepository.UserExistAsync(userId, ct);
         
         if (!userExists)
-            return Unauthorized("User not found");
+            return Unauthorized("User no longer exists");
         
         var result = await _tableValidator.ValidateTableCreationAsync(userId, req.TableName);
 
@@ -56,9 +56,9 @@ public class TableController(
     }
 
     [HttpGet("{tableId:guid}")]
-    public async Task<IActionResult> GetTable([FromRoute] Guid tableId)
+    public async Task<IActionResult> GetTable([FromRoute] Guid tableId, CancellationToken ct)
     {
-        var table = await _tableRepository.GetTableByIdAsync(tableId);
+        var table = await _tableRepository.GetTableByIdAsync(tableId, ct);
 
         if (table is null)
             return NotFound();
@@ -75,5 +75,39 @@ public class TableController(
             return NotFound();
         
         return Ok(table.ToDto());
+    }
+
+    [HttpPost("{tableId:guid}/join")]
+    public async Task<IActionResult> JoinTable([FromRoute] Guid tableId, CancellationToken ct)
+    {
+        var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userStringId, out var userId))
+            return Unauthorized("Invalid Claim");
+
+        var validationResult = await _tableValidator.ValidateTableAddMemberAsync(userId, tableId, ct);
+
+        if (validationResult is FailedValidationResult failedResult)
+        {
+            if (failedResult.Type == FailedValidationType.NotFound)
+            {
+                if (failedResult.WrongValue is Guid wrongId && wrongId == userId)
+                    return Unauthorized("User no longer exists");
+
+                return NotFound(failedResult.Message);
+            }
+
+            if (failedResult.Type == FailedValidationType.Conflict)
+                return Conflict(failedResult.Message);
+
+            return BadRequest(failedResult.Message);
+        }
+
+        var added = await _tableRepository.AddMemberAsync(userId, tableId, ct);
+
+        if (!added)
+            return Conflict("Already member");
+
+        return Ok();
     }
 }
