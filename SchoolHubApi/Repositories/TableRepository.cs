@@ -7,12 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SchoolHubApi.Repositories;
 
-public class TableRepository(Context database) : ITableRepository
+public class TableRepository(
+    Context database
+) : ITableRepository
 {
     private readonly Context _database = database;
 
-    public async Task<Table?> GetTableByIdAsync(Guid id)
-        => await _database.Tables.FindAsync(id);
+    public async Task<Table?> GetTableByIdAsync(Guid id, CancellationToken ct = default)
+        => await _database.Tables
+            .AsNoTracking()
+            .SingleOrDefaultAsync(t => t.Id == id, ct);
 
     public async Task<bool> OwnerHasTableNamedAsync(Guid ownerId, string tableName)
         => await _database.Tables.AnyAsync(t => t.OwnerId == ownerId && t.Name == tableName);
@@ -41,4 +45,40 @@ public class TableRepository(Context database) : ITableRepository
             .AsNoTracking()
             .Include(t => t.Owner)
             .SingleOrDefaultAsync(t => t.Owner.Username == owner && t.Name == tableName);
+        
+    public async Task<bool> IsMemberAsync(Guid userId, Guid tableId, CancellationToken ct = default) =>
+        await _database.TableMembers
+            .AsNoTracking()
+            .AnyAsync(m => m.TableId == tableId && m.UserId == userId, ct);
+
+    public async Task<bool> AddMemberAsync(Guid userId, Guid tableId, CancellationToken ct)
+    {
+        var tableExists = await _database.Tables.AnyAsync(t => t.Id == tableId, ct);
+        var userExists = await _database.Users.AnyAsync(u => u.Id == userId, ct);
+        var alreadyMember = await _database.TableMembers
+            .AnyAsync(m => m.TableId == tableId && m.UserId == userId, ct);
+
+        if (!tableExists || !userExists || alreadyMember)
+            return false;
+        
+        var member = new TableMember
+        {
+            UserId = userId,
+            TableId = tableId,
+            Role = TableRole.Member
+        };
+
+        _database.TableMembers.Add(member);
+
+        try
+        {
+            await _database.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

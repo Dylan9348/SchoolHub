@@ -121,6 +121,6 @@ public class UserRepository(Context database) : IUserRepository
     public async Task<SchoolHubUser?> GetUserByIdAsync(Guid id) => 
         await _database.Users.FindAsync(id);
     
-    public async Task<bool> UserExistAsync(Guid id) =>
-        await _database.Users.AnyAsync(u => u.Id == id);
+    public async Task<bool> UserExistAsync(Guid id, CancellationToken ct = default) =>
+        await _database.Users.AnyAsync(u => u.Id == id, ct);
 }
