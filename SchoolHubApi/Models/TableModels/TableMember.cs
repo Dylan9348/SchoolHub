@@ -10,6 +10,6 @@ public class TableMember
     public Guid TableId { get; set; }
     public Table Table { get; set; } = null!;
     public Guid UserId { get; set; }
-    public SchoolHubUser User { get; set; } = new();
+    public SchoolHubUser User { get; set; } = null!;
     public TableRole Role { get; set; } = TableRole.Member;
 }
