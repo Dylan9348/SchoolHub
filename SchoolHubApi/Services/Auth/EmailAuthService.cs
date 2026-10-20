@@ -2,7 +2,8 @@
 using SchoolHubApi.Enums;
 
 using FluentEmail.Core;
-using SchoolHubApi.Exceptions;
+using FluentResults;
+using SchoolHubApi.Results;
 using System.Net;
 
 namespace SchoolHubApi.Services.Auth;
@@ -71,21 +72,31 @@ public class EmailAuthService(IFluentEmail fluentEmail) : IEmailAuthService
         """;
     }
 
-    public async Task<bool> SendVerificationMailAsync(string email, Language language, string code)
+    private static (string Subject, string BoldDisclaimer, string Disclaimer)? GetContent(Language language) => language switch
     {
-        var (subject, boldDisclaimer, disclaimer) = language switch
-        {
-            Language.Spanish => (SpanishSubject, SpanishDisBold, SpanishDisclaimer),
-            Language.English => (EnglishSubject, EnglishDisBold, EnglishDisclaimer),
-            _ => throw new LanguageNotSupportedException(language)
-        };
+        Language.Spanish => (SpanishSubject, SpanishDisBold, SpanishDisclaimer),
+        Language.English => (EnglishSubject, EnglishDisBold, EnglishDisclaimer),
+        _ => null
+    };
+
+    public async Task<Result> SendVerificationMailAsync(string email, Language language, string code)
+    {
+        var content = GetContent(language);
+
+        if (content is null)
+            return Result.Fail(new InvalidError("language", $"Language \"{language}\" is not supported."));
+
+        var (subject, boldDisclaimer, disclaimer) = content.Value;
 
         var response = await _fluentEmail
             .To(email)
             .Subject(subject)
             .Body(BuildEmailHtml(subject, code, boldDisclaimer, disclaimer), isHtml: true)
             .SendAsync();
-        
-        return response.Successful;
+
+        if (!response.Successful)
+            return Result.Fail(new InvalidError("email", $"Failed to send the verification email to \"{email}\"."));
+
+        return Result.Ok();
     }
 }

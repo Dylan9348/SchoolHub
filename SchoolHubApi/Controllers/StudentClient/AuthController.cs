@@ -1,9 +1,11 @@
 
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
 using SchoolHubApi.Enums;
-using SchoolHubApi.Validators.ValidationResults;
+using SchoolHubApi.Extensions;
 using SchoolHubApi.Repositories;
+using SchoolHubApi.Results;
 using SchoolHubApi.Services.Auth;
 using SchoolHubApi.Validators;
 
@@ -26,7 +28,13 @@ public class AuthStudentController(
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn([FromBody] CreateStudentUserDto req, [FromQuery] Language language = Language.English)
     {
-        var token = await _userRegistrationService.RegisterStudentUser(req, language);
+        var result = await _userRegistrationService.RegisterStudentUser(req, language);
+
+        if (result.IsFailed)
+            return result.ToActionResult();
+
+        var token = result.Value;
+
         if (token is null)
             return Created();
 
@@ -36,15 +44,15 @@ public class AuthStudentController(
     [HttpPost("signin/verify-email/{code}")]
     public async Task<IActionResult> VerifyEmail([FromBody] string token, [FromRoute] string code)
     {
-        var isValid = await _pendingValidator.IsValid(token);
+        var validation = await _pendingValidator.IsValid(token);
 
-        if (isValid is FailedValidationResult failedResult)
-            return BadRequest(new { type = failedResult.Type, message = failedResult.Message });
+        if (validation.IsFailed)
+            return validation.ToActionResult();
 
-        var finished = await _userRegistrationService.VerifyAndFinishAsync(token, code);
+        var result = await _userRegistrationService.VerifyAndFinishAsync(token, code);
 
-        if (!finished)
-            return BadRequest();
+        if (result.IsFailed)
+            return result.ToActionResult();
 
         return Created();
     }
@@ -55,13 +63,13 @@ public class AuthStudentController(
         var user = await _userRepository.GetUserByUsernameAsync(req.Username);
 
         if (user is null)
-            return BadRequest($"user '{req.Username}' does not exists");
+            return Result.Fail(new NotFoundError("username", $"user '{req.Username}' does not exists")).ToActionResult();
 
-        var token = _authService.AuthenticateUser(user, req.Password);
+        var result = _authService.AuthenticateUser(user, req.Password);
 
-        if (token is null)
-            return BadRequest("wrong password");
+        if (result.IsFailed)
+            return result.ToActionResult();
 
-        return Ok(token);
+        return Ok(result.Value);
     }
 }
