@@ -1,13 +1,14 @@
 
 using System.Security.Claims;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolHubApi.DTOs;
 using SchoolHubApi.Enums;
 using SchoolHubApi.Extensions;
 using SchoolHubApi.Repositories;
+using SchoolHubApi.Results;
 using SchoolHubApi.Validators;
-using SchoolHubApi.Validators.ValidationResults;
 
 namespace SchoolHubApi.Controllers.Tables;
 
@@ -37,18 +38,10 @@ public class TableController(
         if (!userExists)
             return Unauthorized("User no longer exists");
         
-        var result = await _tableValidator.ValidateTableCreationAsync(userId, req.TableName);
+        var validation = await _tableValidator.ValidateTableCreationAsync(userId, req.TableName);
 
-        if (result is FailedValidationResult failedResult)
-        {
-            if (failedResult.Type == FailedValidationType.TooShort)
-                return BadRequest("Table name is too short. It must be 2 chars of length at least");
-            
-            if (failedResult.Type == FailedValidationType.TooLong)
-                return BadRequest("Table name is too long. It must be 50 chars of length at most");
-            
-            return Conflict(failedResult.Message);
-        }
+        if (validation.IsFailed)
+            return validation.ToActionResult();
 
         var tableId = await _tableRepository.CreateTableAsync(userId, req.TableName);
 
@@ -61,7 +54,7 @@ public class TableController(
         var table = await _tableRepository.GetTableByIdAsync(tableId, ct);
 
         if (table is null)
-            return NotFound();
+            return Result.Fail(new NotFoundError("tableId", "Table not found.")).ToActionResult();
         
         return Ok(table.ToDto());
     }
@@ -72,7 +65,7 @@ public class TableController(
         var table = await _tableRepository.GetTableAsync(req.OwnerName, req.TableName);
 
         if (table is null)
-            return NotFound();
+            return Result.Fail(new NotFoundError("tableName", "Table not found.")).ToActionResult();
         
         return Ok(table.ToDto());
     }
@@ -85,28 +78,20 @@ public class TableController(
         if (!Guid.TryParse(userStringId, out var userId))
             return Unauthorized("Invalid Claim");
 
-        var validationResult = await _tableValidator.ValidateTableAddMemberAsync(userId, tableId, ct);
+        var validation = await _tableValidator.ValidateTableAddMemberAsync(userId, tableId, ct);
 
-        if (validationResult is FailedValidationResult failedResult)
+        if (validation.IsFailed)
         {
-            if (failedResult.Type == FailedValidationType.NotFound)
-            {
-                if (failedResult.WrongValue is Guid wrongId && wrongId == userId)
-                    return Unauthorized("User no longer exists");
+            if (validation.Errors.FirstOrDefault() is NotFoundError { Field: "userId" })
+                return Unauthorized("User no longer exists");
 
-                return NotFound(failedResult.Message);
-            }
-
-            if (failedResult.Type == FailedValidationType.Conflict)
-                return Conflict(failedResult.Message);
-
-            return BadRequest(failedResult.Message);
+            return validation.ToActionResult();
         }
 
         var added = await _tableRepository.AddMemberAsync(userId, tableId, ct);
 
         if (!added)
-            return Conflict("Already member");
+            return Result.Fail(new ConflictError("tableId", "Already member")).ToActionResult();
 
         return Ok();
     }

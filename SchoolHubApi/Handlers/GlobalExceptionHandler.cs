@@ -1,6 +1,5 @@
 
 using Microsoft.AspNetCore.Diagnostics;
-using SchoolHubApi.Exceptions;
 
 namespace SchoolHubApi.Handlers;
 
@@ -10,15 +9,7 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
         HttpContext context, Exception exception, CancellationToken ct
     )
     {
-        var (status, title) = exception switch
-        {
-            BadRequestException => (400, "Bad Request"),
-            NotFoundException => (404, "Not Found"),
-            ConflicException => (409, "Conflict"),
-            _ => (500, "An unexpected error occurred")
-        };
-
-        context.Response.StatusCode = status;
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         return await problemDetails.TryWriteAsync(new ProblemDetailsContext
         {
@@ -26,9 +17,8 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
             Exception = exception,
             ProblemDetails = new() 
             {
-                Status = status, 
-                Title = title,
-                Detail = status == 500 ? null : exception.Message
+                Status = StatusCodes.Status500InternalServerError, 
+                Title = "An unexpected error occurred"
             }
         });
     }

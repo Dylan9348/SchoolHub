@@ -1,10 +1,11 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using SchoolHubApi.Data;
 using SchoolHubApi.Models.AuthModels;
-using SchoolHubApi.Exceptions;
+using SchoolHubApi.Results;
 using SchoolHubApi.Models.UserModels;
 
 namespace SchoolHubApi.Repositories;
@@ -44,12 +45,12 @@ public class UserRepository(Context database) : IUserRepository
         return pending;
     }
 
-    public async Task SaveStudentUserWithoutEmailAsync(string username, string password)
+    public async Task<Result> SaveStudentUserWithoutEmailAsync(string username, string password)
     {
         var existsOther = await _database.Users.AnyAsync(u => u.Username == username);
 
         if (existsOther)
-            throw new UsernameAlreadyTakenException(username);
+            return Result.Fail(new AlreadyTakenError("username", $"Username \"{username}\" already taken"));
 
         var user = new StudentUser()
         {
@@ -59,9 +60,11 @@ public class UserRepository(Context database) : IUserRepository
 
         _database.Add(user);
         await _database.SaveChangesAsync();
+
+        return Result.Ok();
     }
 
-    public async Task SavePendingUserAsync(string username, string email, string password, UserRole role, string code, string token)
+    public async Task<Result> SavePendingUserAsync(string username, string email, string password, UserRole role, string code, string token)
     {
         var secret = Environment.GetEnvironmentVariable("CODE_HASH_SECRET")
             ?? throw new InvalidOperationException("MISSING ENVIRONMENT VARIABLE: CODE_HASH_SECRET");
@@ -76,7 +79,7 @@ public class UserRepository(Context database) : IUserRepository
         var usernameAlreadyTaken = await _database.Users.AnyAsync(u => u.Username == username);
 
         if (usernameAlreadyTaken)
-            throw new UsernameAlreadyTakenException(username);
+            return Result.Fail(new AlreadyTakenError("username", $"Username \"{username}\" already taken"));
 
         var pending = new PendingRegistration
         {
@@ -90,11 +93,15 @@ public class UserRepository(Context database) : IUserRepository
 
         _database.Add(pending);
         await _database.SaveChangesAsync();
+
+        return Result.Ok();
     }
-    public async Task AcceptPendingUserAsync(string token)
+    public async Task<Result> AcceptPendingUserAsync(string token)
     {
-        var pending = await _database.PendingRegistrations.FirstOrDefaultAsync(p => p.Token == token)
-            ?? throw new NotFoundException("Pending register not found");
+        var pending = await _database.PendingRegistrations.FirstOrDefaultAsync(p => p.Token == token);
+
+        if (pending is null)
+            return Result.Fail(new NotFoundError("pendingRegistration", "Pending register not found"));
         
         SchoolHubUser user = pending.Role switch
         {
@@ -116,6 +123,8 @@ public class UserRepository(Context database) : IUserRepository
         
         _database.Add(user);
         await _database.SaveChangesAsync();
+
+        return Result.Ok();
     }
 
     public async Task<SchoolHubUser?> GetUserByIdAsync(Guid id) => 

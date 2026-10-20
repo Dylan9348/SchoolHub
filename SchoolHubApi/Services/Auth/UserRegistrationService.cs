@@ -1,4 +1,5 @@
 
+using FluentResults;
 using SchoolHubApi.DTOs;
 using SchoolHubApi.Enums;
 using SchoolHubApi.Models.UserModels;
@@ -18,41 +19,61 @@ public class UserRegistrationService(
     private readonly IEmailAuthService _emailService = emailAuthService;
     private readonly PendingRegistrationValidator _pendingRegistrationValidator = pendingRegistrationValidator;
 
-    public async Task<string> StartRegisterWithEmailAsync(string username, string password, string email, UserRole role, Language language)
+    public async Task<Result<string>> StartRegisterWithEmailAsync(string username, string password, string email, UserRole role, Language language)
     {
         var code = _tokenService.GenerateSecureRandomString(6);
         var token = _tokenService.GenerateSecureRandomString(10);
 
-        await _userRepository.SavePendingUserAsync(username, email, password, role, code, token);
-        await _emailService.SendVerificationMailAsync(email, language, code);
+        var saveResult = await _userRepository.SavePendingUserAsync(username, email, password, role, code, token);
 
-        return token;
+        if (saveResult.IsFailed)
+            return Result.Fail<string>(saveResult.Errors);
+
+        var mailResult = await _emailService.SendVerificationMailAsync(email, language, code);
+
+        if (mailResult.IsFailed)
+            return Result.Fail<string>(mailResult.Errors);
+
+        return Result.Ok(token);
     }
 
-    public async Task<bool> VerifyAndFinishAsync(string token, string code)
+    public async Task<Result> VerifyAndFinishAsync(string token, string code)
     {
-        var isValid = await _pendingRegistrationValidator.ValidateCodeAsync(token, code);
+        var validationResult = await _pendingRegistrationValidator.ValidateCodeAsync(token, code);
 
-        if (!isValid)
-            return false;
+        if (validationResult.IsFailed)
+            return validationResult;
 
-        await _userRepository.AcceptPendingUserAsync(token);
+        var acceptResult = await _userRepository.AcceptPendingUserAsync(token);
 
-        return true;
+        if (acceptResult.IsFailed)
+            return acceptResult;
+
+        return Result.Ok();
     }
 
-    public async Task RegisterStudentUserWithoutEmailAsync(string username, string password)
+    public async Task<Result> RegisterStudentUserWithoutEmailAsync(string username, string password)
     {
-        await _userRepository.SaveStudentUserWithoutEmailAsync(username, password);
+        return await _userRepository.SaveStudentUserWithoutEmailAsync(username, password);
     }
 
-    public async Task<string?> RegisterStudentUser(CreateStudentUserDto student, Language language)
+    public async Task<Result<string?>> RegisterStudentUser(CreateStudentUserDto student, Language language)
     {
         if (student.Email is null)
-            await RegisterStudentUserWithoutEmailAsync(student.Username, student.Password);
-        else
-            return await StartRegisterWithEmailAsync(student.Username, student.Password, student.Email, UserRole.Student, language);
-        
-        return null;
+        {
+            var result = await RegisterStudentUserWithoutEmailAsync(student.Username, student.Password);
+
+            if (result.IsFailed)
+                return Result.Fail<string?>(result.Errors);
+
+            return Result.Ok<string?>(null);
+        }
+
+        var emailResult = await StartRegisterWithEmailAsync(student.Username, student.Password, student.Email, UserRole.Student, language);
+
+        if (emailResult.IsFailed)
+            return Result.Fail<string?>(emailResult.Errors);
+
+        return Result.Ok<string?>(emailResult.Value);
     }
 }

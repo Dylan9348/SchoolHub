@@ -1,7 +1,8 @@
 
+using FluentResults;
 using SchoolHubApi.Enums;
 using SchoolHubApi.Repositories;
-using SchoolHubApi.Validators.ValidationResults;
+using SchoolHubApi.Results;
 
 namespace SchoolHubApi.Validators;
 
@@ -13,31 +14,34 @@ public class TableValidator(
     private readonly ITableRepository _tableRepository = tableRepository;
     private readonly IUserRepository _userRepository = userRepository;
 
-    public async Task<ValidationResult> ValidateTableCreationAsync(Guid userId, string tableName)
-    {
-        if (tableName.Length < 2)
-            return new FailedValidationResult(FailedValidationType.TooShort, tableName, "tableName too short");
+    private const int MinTableNameLength = 2;
+    private const int MaxTableNameLength = 50;
 
-        if (tableName.Length > 50)
-            return new FailedValidationResult(FailedValidationType.TooLong, tableName, "tableName is too long");
+    public async Task<Result> ValidateTableCreationAsync(Guid userId, string tableName)
+    {
+        if (tableName.Length < MinTableNameLength)
+            return Result.Fail(new TooShortError("tableName", MinTableNameLength, $"Table name is too short. It must be {MinTableNameLength} chars of length at least"));
+
+        if (tableName.Length > MaxTableNameLength)
+            return Result.Fail(new TooLongError("tableName", MaxTableNameLength, $"Table name is too long. It must be {MaxTableNameLength} chars of length at most"));
 
         if (await _tableRepository.OwnerHasTableNamedAsync(userId, tableName))
-            return new FailedValidationResult(FailedValidationType.Conflict, tableName, "You already have a table with that name.");
+            return Result.Fail(new ConflictError("tableName", "You already have a table with that name."));
 
-        return new PassedValidationResult();
+        return Result.Ok();
     }
 
-    public async Task<ValidationResult> ValidateTableAddMemberAsync(Guid userId, Guid tableId, CancellationToken ct = default)
+    public async Task<Result> ValidateTableAddMemberAsync(Guid userId, Guid tableId, CancellationToken ct = default)
     {
         if (!await _userRepository.UserExistAsync(userId, ct))
-            return new FailedValidationResult(FailedValidationType.NotFound, userId, "User not found.");
+            return Result.Fail(new NotFoundError("userId", "User not found."));
 
         if (await _tableRepository.GetTableByIdAsync(tableId, ct) is null)
-            return new FailedValidationResult(FailedValidationType.NotFound, tableId, "Table not found.");
+            return Result.Fail(new NotFoundError("tableId", "Table not found."));
 
         if (await _tableRepository.IsMemberAsync(userId, tableId, ct))
-            return new FailedValidationResult(FailedValidationType.Conflict, userId, "User is already a member of the table.");
+            return Result.Fail(new ConflictError("userId", "User is already a member of the table."));
 
-        return new PassedValidationResult();
+        return Result.Ok();
     }
 }

@@ -1,9 +1,10 @@
 
+using FluentResults;
 using SchoolHubApi.Enums;
 
 namespace SchoolHubApi.Services.Auth;
 
 public interface IEmailAuthService
 {
-    Task<bool> SendVerificationMailAsync(string email, Language language, string code);
+    Task<Result> SendVerificationMailAsync(string email, Language language, string code);
 }
