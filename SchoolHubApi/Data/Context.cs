@@ -28,6 +28,7 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
 
     public DbSet<Table> Tables => Set<Table>();
     public DbSet<TableMember> TableMembers => Set<TableMember>();
+    public DbSet<Category> TableCategories => Set<Category>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,5 +72,11 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
         modelBuilder.Entity<Table>()
             .HasIndex(t => new { t.OwnerId, t.Name })
             .IsUnique();
+    
+        modelBuilder.Entity<Category>()
+            .HasOne(c => c.Table)
+            .WithMany(t => t.Categories)
+            .HasForeignKey(c => c.TableId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

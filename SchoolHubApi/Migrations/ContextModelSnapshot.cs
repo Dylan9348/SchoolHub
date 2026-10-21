@@ -314,7 +314,7 @@ namespace SchoolHubApi.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("Category");
+                    b.ToTable("TableCategories");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
