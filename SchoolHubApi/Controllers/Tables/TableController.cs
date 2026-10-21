@@ -1,5 +1,4 @@
 
-using System.Security.Claims;
 using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +27,7 @@ public class TableController(
     [HttpPost("create")]
     public async Task<IActionResult> CreateTable([FromBody] CreateTableDto req, CancellationToken ct)
     {
-        var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userStringId, out var userId))
+        if (User.GetUserId() is not Guid userId)
             return Unauthorized("Invalid Claim");
 
         var userExists = await _userRepository.UserExistAsync(userId, ct);
@@ -73,9 +70,7 @@ public class TableController(
     [HttpPost("{tableId:guid}/join")]
     public async Task<IActionResult> JoinTable([FromRoute] Guid tableId, CancellationToken ct)
     {
-        var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userStringId, out var userId))
+        if (User.GetUserId() is not Guid userId)
             return Unauthorized("Invalid Claim");
 
         var validation = await _tableValidator.ValidateTableAddMemberAsync(userId, tableId, ct);
