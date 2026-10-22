@@ -9,6 +9,7 @@ public static class ValidatorsException
     {
         services.AddScoped<PendingRegistrationValidator>();
         services.AddScoped<TableValidator>();
+        services.AddScoped<CategoryValidator>();
 
         return services;
     }
