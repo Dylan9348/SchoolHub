@@ -312,6 +312,9 @@ namespace SchoolHubApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryName")
+                        .IsUnique();
+
                     b.HasIndex("TableId");
 
                     b.ToTable("TableCategories");

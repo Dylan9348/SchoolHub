@@ -78,5 +78,9 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .WithMany(t => t.Categories)
             .HasForeignKey(c => c.TableId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Category>()
+            .HasIndex(c => c.CategoryName)
+            .IsUnique();
     }
 }
