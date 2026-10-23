@@ -1,8 +1,7 @@
-
 namespace SchoolHubApi.Enums;
 
 public enum WorkType
 {
-    Instructions,
+    Instruction,
     Quiz
 }

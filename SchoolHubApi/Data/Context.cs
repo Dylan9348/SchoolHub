@@ -3,7 +3,7 @@ using SchoolHubApi.Models.AuthModels;
 using SchoolHubApi.Models.SchoolModels;
 using SchoolHubApi.Models.UserModels;
 using SchoolHubApi.Models.TableModels;
-using SchoolHubApi.Models.TableModels.Works;
+using SchoolHubApi.Models.WorkModels;
 using SchoolHubApi.Enums;
 
 namespace SchoolHubApi.Data;
@@ -24,11 +24,12 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
 
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Mark> Marks => Set<Mark>();
-    public DbSet<SchoolWork> Works => Set<SchoolWork>();
 
     public DbSet<Table> Tables => Set<Table>();
     public DbSet<TableMember> TableMembers => Set<TableMember>();
     public DbSet<Category> TableCategories => Set<Category>();
+
+    public DbSet<Work> Works => Set<Work>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,11 +38,6 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .HasValue<SchoolHubUser>(UserRole.User)
             .HasValue<StudentUser>(UserRole.Student)
             .HasValue<TeacherUser>(UserRole.Teacher);
-        
-        modelBuilder.Entity<TableWork>()
-            .HasDiscriminator<WorkType>("WorkType")
-            .HasValue<TableInstructions>(WorkType.Instructions)
-            .HasValue<TableQuiz>(WorkType.Quiz);
         
         modelBuilder.Entity<Table>()
             .HasOne(t => t.Owner)
@@ -82,5 +78,13 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
         modelBuilder.Entity<Category>()
             .HasIndex(c => c.CategoryName)
             .IsUnique();
+
+        modelBuilder.Entity<Work>()
+            .HasDiscriminator<WorkType>("WorkType")
+            .HasValue<WorkInstruction>(WorkType.Instruction)
+            .HasValue<WorkQuiz>(WorkType.Quiz);
+
+        modelBuilder.Entity<WorkQuiz>()
+            .OwnsOne(w => w.Questions, b => b.ToJson());
     }
 }
