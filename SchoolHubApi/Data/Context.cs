@@ -90,6 +90,12 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .WithMany()
             .HasForeignKey(m => m.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<TableMessage>()
+            .HasOne(m => m.Sender)
+            .WithMany(m => m.TableMessages)
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Category>()
             .HasMany(c => c.Messages)

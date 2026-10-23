@@ -338,6 +338,12 @@ namespace SchoolHubApi.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<bool>("Pending")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("TableId")
                         .HasColumnType("uuid");
 
@@ -347,6 +353,8 @@ namespace SchoolHubApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("SenderId");
 
                     b.HasIndex("TableId");
 
@@ -603,6 +611,12 @@ namespace SchoolHubApi.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "Sender")
+                        .WithMany("TableMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SchoolHubApi.Models.TableModels.Table", "Table")
                         .WithMany("Messages")
                         .HasForeignKey("TableId")
@@ -614,6 +628,8 @@ namespace SchoolHubApi.Migrations
                         .HasForeignKey("WorkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Sender");
 
                     b.Navigation("Table");
 
@@ -716,6 +732,8 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("OwnTables");
 
                     b.Navigation("Schools");
+
+                    b.Navigation("TableMessages");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
