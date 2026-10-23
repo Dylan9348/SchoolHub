@@ -399,19 +399,19 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
                     b.Property<bool>("IsHomework")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("MaxValue")
-                        .HasColumnType("integer");
+                    b.Property<long>("MaxValue")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("TeacherUserId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
@@ -423,9 +423,9 @@ namespace SchoolHubApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SubjectId");
+                    b.HasIndex("CreatorId");
 
-                    b.HasIndex("TeacherUserId");
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("Works");
 
@@ -638,13 +638,17 @@ namespace SchoolHubApi.Migrations
 
             modelBuilder.Entity("SchoolHubApi.Models.WorkModels.Work", b =>
                 {
+                    b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "Creator")
+                        .WithMany("Works")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SchoolHubApi.Models.SchoolModels.Subject", null)
                         .WithMany("Works")
                         .HasForeignKey("SubjectId");
 
-                    b.HasOne("SchoolHubApi.Models.UserModels.TeacherUser", null)
-                        .WithMany("Works")
-                        .HasForeignKey("TeacherUserId");
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
@@ -734,6 +738,8 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Schools");
 
                     b.Navigation("TableMessages");
+
+                    b.Navigation("Works");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.StudentUser", b =>
@@ -744,8 +750,6 @@ namespace SchoolHubApi.Migrations
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.TeacherUser", b =>
                 {
                     b.Navigation("Classrooms");
-
-                    b.Navigation("Works");
                 });
 #pragma warning restore 612, 618
         }

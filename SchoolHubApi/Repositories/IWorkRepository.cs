@@ -7,7 +7,7 @@ public interface IWorkRepository
 {
     Task<Work?> GetWorkAsync(Guid id);
 
-    Task<Guid> CreateInstructionWorkAsync(string instructions, string title, int maxValue = 0, bool isHomework = false, DateOnly? date = null);
+    Task<Guid> CreateInstructionWorkAsync(Guid creatorId, string instructions, string title, uint maxValue = 0, bool isHomework = false, DateOnly? date = null);
 
-    Task<Guid> CreateQuizWorkAsync(Dictionary<string, string?> questions, string title, int maxValue = 0, bool isHomework = false, DateOnly? date = null);
+    Task<Guid> CreateQuizWorkAsync(Guid creatorId, Dictionary<string, string?> questions, string title, uint maxValue = 0, bool isHomework = false, DateOnly? date = null);
 }

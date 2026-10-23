@@ -9,7 +9,7 @@ public class WorkRepository(Context database) : IWorkRepository
 {
     private readonly Context _database = database;
 
-    public async Task<Guid> CreateInstructionWorkAsync(string instructions, string title, int maxValue = 0, bool isHomework = false, DateOnly? date = null)
+    public async Task<Guid> CreateInstructionWorkAsync(Guid creatorId, string instructions, string title, uint maxValue = 0, bool isHomework = false, DateOnly? date = null)
     {
         var work = new WorkInstruction
         {
@@ -18,6 +18,7 @@ public class WorkRepository(Context database) : IWorkRepository
             Title = title,
             MaxValue = maxValue,
             IsHomework = isHomework,
+            CreatorId = creatorId,
         };
 
         _database.Add(work);
@@ -27,7 +28,7 @@ public class WorkRepository(Context database) : IWorkRepository
         return work.Id;
     }
 
-    public async Task<Guid> CreateQuizWorkAsync(Dictionary<string, string?> questions, string title, int maxValue = 0, bool isHomework = false, DateOnly? date = null)
+    public async Task<Guid> CreateQuizWorkAsync(Guid creatorId, Dictionary<string, string?> questions, string title, uint maxValue = 0, bool isHomework = false, DateOnly? date = null)
     {
         var work = new WorkQuiz
         {
@@ -36,6 +37,7 @@ public class WorkRepository(Context database) : IWorkRepository
             MaxValue = maxValue,
             IsHomework = isHomework,
             Questions = questions,
+            CreatorId = creatorId,
         };
 
         _database.Add(work);
