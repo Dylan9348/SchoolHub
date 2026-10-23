@@ -10,6 +10,6 @@ public class Category
     public Table Table { get; set; } = null!;
     
     public string CategoryName { get; set; } = "";
-    
-    public ICollection<SchoolWork> Works { get; set; } = [];
+
+    public ICollection<TableMessage> Messages { get; set; } = [];
 }
