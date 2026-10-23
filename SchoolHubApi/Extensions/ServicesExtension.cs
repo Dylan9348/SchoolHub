@@ -1,5 +1,6 @@
 
 using SchoolHubApi.Services.Auth;
+using SchoolHubApi.Services.General;
 using SchoolHubApi.Services.Tables;
 
 namespace SchoolHubApi.Extensions;
@@ -13,6 +14,7 @@ public static class ServicesExtension
         services.AddScoped<IUserRegistrationService, UserRegistrationService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IWorkService, WorkService>();
 
         return services;
     }
