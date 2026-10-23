@@ -1,6 +1,7 @@
 
 using SchoolHubApi.Models.SchoolModels;
 using SchoolHubApi.Models.TableModels;
+using SchoolHubApi.Models.WorkModels;
 
 namespace SchoolHubApi.Models.UserModels;
 
@@ -14,4 +15,5 @@ public class SchoolHubUser
     public ICollection<TableMember> Memberships { get; set; } = [];
     public ICollection<Table> OwnTables { get; set; } = [];
     public ICollection<TableMessage> TableMessages { get; set; } = [];
+    public ICollection<Work> Works { get; set; } = [];
 }
