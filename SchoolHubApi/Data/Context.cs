@@ -104,6 +104,12 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Work>()
+            .HasOne(w => w.Creator)
+            .WithMany(u => u.Works)
+            .HasForeignKey(w => w.CreatorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Work>()
             .HasDiscriminator<WorkType>("WorkType")
             .HasValue<WorkInstruction>(WorkType.Instruction)
             .HasValue<WorkQuiz>(WorkType.Quiz);
