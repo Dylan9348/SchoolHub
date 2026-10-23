@@ -1,5 +1,4 @@
 
-using SchoolHubApi.Models.TableModels.Works;
 using SchoolHubApi.Models.UserModels;
 
 namespace SchoolHubApi.Models.TableModels;
@@ -12,4 +11,5 @@ public class Table
     public SchoolHubUser Owner { get; set; } = null!;
     public ICollection<Category> Categories { get; set; } = [];
     public ICollection<TableMember> Members { get; set; } = [];
+    public ICollection<TableMessage> Messages { get; set; } = [];
 }
