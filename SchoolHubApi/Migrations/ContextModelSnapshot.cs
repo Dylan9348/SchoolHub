@@ -326,6 +326,35 @@ namespace SchoolHubApi.Migrations
                     b.ToTable("TableMembers");
                 });
 
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.TableMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("TableId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WorkId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("TableId");
+
+                    b.HasIndex("WorkId");
+
+                    b.ToTable("TableMessage");
+                });
+
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -362,9 +391,6 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -388,8 +414,6 @@ namespace SchoolHubApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("SubjectId");
 
@@ -572,12 +596,32 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SchoolHubApi.Models.WorkModels.Work", b =>
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.TableMessage", b =>
                 {
                     b.HasOne("SchoolHubApi.Models.TableModels.Category", null)
-                        .WithMany("Works")
-                        .HasForeignKey("CategoryId");
+                        .WithMany("Messages")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("SchoolHubApi.Models.TableModels.Table", "Table")
+                        .WithMany("Messages")
+                        .HasForeignKey("TableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolHubApi.Models.WorkModels.Work", "Work")
+                        .WithMany()
+                        .HasForeignKey("WorkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Table");
+
+                    b.Navigation("Work");
+                });
+
+            modelBuilder.Entity("SchoolHubApi.Models.WorkModels.Work", b =>
+                {
                     b.HasOne("SchoolHubApi.Models.SchoolModels.Subject", null)
                         .WithMany("Works")
                         .HasForeignKey("SubjectId");
@@ -653,7 +697,7 @@ namespace SchoolHubApi.Migrations
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Category", b =>
                 {
-                    b.Navigation("Works");
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.Table", b =>
@@ -661,6 +705,8 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Categories");
 
                     b.Navigation("Members");
+
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>

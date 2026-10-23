@@ -79,6 +79,24 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .HasIndex(c => c.CategoryName)
             .IsUnique();
 
+        modelBuilder.Entity<TableMessage>()
+            .HasOne(m => m.Table)
+            .WithMany(t => t.Messages)
+            .HasForeignKey(m => m.TableId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TableMessage>()
+            .HasOne(m => m.Work)
+            .WithMany()
+            .HasForeignKey(m => m.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Category>()
+            .HasMany(c => c.Messages)
+            .WithOne()
+            .HasForeignKey("CategoryId")
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Work>()
             .HasDiscriminator<WorkType>("WorkType")
             .HasValue<WorkInstruction>(WorkType.Instruction)
