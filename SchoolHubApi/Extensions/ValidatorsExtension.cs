@@ -10,6 +10,7 @@ public static class ValidatorsException
         services.AddScoped<PendingRegistrationValidator>();
         services.AddScoped<TableValidator>();
         services.AddScoped<CategoryValidator>();
+        services.AddScoped<WorkValidator>();
 
         return services;
     }
