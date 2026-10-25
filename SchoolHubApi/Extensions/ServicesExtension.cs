@@ -15,6 +15,7 @@ public static class ServicesExtension
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IWorkService, WorkService>();
+        services.AddScoped<IMessageService, MessageService>();
 
         return services;
     }
