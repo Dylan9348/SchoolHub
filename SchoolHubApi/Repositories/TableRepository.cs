@@ -51,6 +51,13 @@ public class TableRepository(
             .AsNoTracking()
             .AnyAsync(m => m.TableId == tableId && m.UserId == userId, ct);
 
+    public async Task<TableRole?> GetMemberRoleAsync(Guid userId, Guid tableId, CancellationToken ct = default) =>
+        await _database.TableMembers
+            .AsNoTracking()
+            .Where(m => m.TableId == tableId && m.UserId == userId)
+            .Select(m => (TableRole?)m.Role)
+            .FirstOrDefaultAsync(ct);
+
     public async Task<bool> AddMemberAsync(Guid userId, Guid tableId, CancellationToken ct)
     {
         var tableExists = await _database.Tables.AnyAsync(t => t.Id == tableId, ct);

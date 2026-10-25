@@ -1,4 +1,5 @@
 
+using SchoolHubApi.Models.SchoolModels.Permissions;
 using SchoolHubApi.Models.TableModels;
 using SchoolHubApi.Models.UserModels;
 
@@ -11,5 +12,6 @@ public interface ITableRepository
     Task<Guid> CreateTableAsync(Guid userId, string tableName);
     Task<Table?> GetTableAsync(string owner, string tableName);
     Task<bool> IsMemberAsync(Guid userId, Guid tableId, CancellationToken ct = default);
+    Task<TableRole?> GetMemberRoleAsync(Guid userId, Guid tableId, CancellationToken ct = default);
     Task<bool> AddMemberAsync(Guid userId, Guid tableId, CancellationToken ct);
 }
