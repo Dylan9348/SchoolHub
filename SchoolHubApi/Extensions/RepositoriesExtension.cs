@@ -11,6 +11,7 @@ public static class RepositoriesExtension
         services.AddScoped<ITableRepository, TableRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IWorkRepository, WorkRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
 
         return services;
     }
