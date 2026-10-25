@@ -35,4 +35,19 @@ public class MessageService(
 
         return Result.Ok();
     }
+
+    public async Task<Result> AprovePendingMessageAsync(Guid aproverId, Guid messageId, CancellationToken ct = default)
+    {
+        var validationResult = await _messageValidator.ValidateAproveMessageAsync(aproverId, messageId, ct);
+
+        if (validationResult.IsFailed)
+            return validationResult;
+            
+        var result = await _messageRepository.AproveMessageAsync(messageId);
+
+        if (result.IsFailed)
+            return result;
+
+        return Result.Ok();
+    }
 }
