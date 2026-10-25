@@ -335,9 +335,6 @@ namespace SchoolHubApi.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CategoryId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
@@ -357,15 +354,13 @@ namespace SchoolHubApi.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CategoryId1");
-
                     b.HasIndex("SenderId");
 
                     b.HasIndex("TableMemberId");
 
                     b.HasIndex("WorkId");
 
-                    b.ToTable("TableMessage");
+                    b.ToTable("TableMessages");
                 });
 
             modelBuilder.Entity("SchoolHubApi.Models.UserModels.SchoolHubUser", b =>
@@ -611,15 +606,9 @@ namespace SchoolHubApi.Migrations
 
             modelBuilder.Entity("SchoolHubApi.Models.TableModels.TableMessage", b =>
                 {
-                    b.HasOne("SchoolHubApi.Models.TableModels.Category", null)
+                    b.HasOne("SchoolHubApi.Models.TableModels.Category", "Category")
                         .WithMany("Messages")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolHubApi.Models.TableModels.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

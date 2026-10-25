@@ -28,6 +28,7 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
     public DbSet<Table> Tables => Set<Table>();
     public DbSet<TableMember> TableMembers => Set<TableMember>();
     public DbSet<Category> TableCategories => Set<Category>();
+    public DbSet<TableMessage> TableMessages => Set<TableMessage>();
 
     public DbSet<Work> Works => Set<Work>();
 
@@ -95,12 +96,6 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .HasOne(m => m.Sender)
             .WithMany(m => m.SentMessages)
             .HasForeignKey(m => m.SenderId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Category>()
-            .HasMany(c => c.Messages)
-            .WithOne()
-            .HasForeignKey("CategoryId")
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Work>()
