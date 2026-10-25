@@ -11,6 +11,7 @@ public static class ValidatorsException
         services.AddScoped<TableValidator>();
         services.AddScoped<CategoryValidator>();
         services.AddScoped<WorkValidator>();
+        services.AddScoped<MessageValidator>();
 
         return services;
     }
