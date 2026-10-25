@@ -27,7 +27,7 @@ public class MessageValidator(
         if (category is null)
             return Result.Fail(new NotFoundError("categoryId", "Category not found."));
 
-        if (await _workRepository.GetWorkAsync(workId, ct) is null)
+        if (!await _workRepository.WorkExistAsync(workId, ct))
             return Result.Fail(new NotFoundError("workId", "Work not found."));
 
         if (!await _tableRepository.IsMemberAsync(userId, category.TableId, ct))
