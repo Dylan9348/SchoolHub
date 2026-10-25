@@ -9,10 +9,10 @@ public class CategoryRepository(Context database) : ICategoryRepository
 {
     private readonly Context _database = database;
 
-    public async Task<Category?> GetCategoryAsync(Guid categoryId) => 
+    public async Task<Category?> GetCategoryAsync(Guid categoryId, CancellationToken ct = default) =>
         await _database.TableCategories
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == categoryId);
+            .FirstOrDefaultAsync(c => c.Id == categoryId, ct);
     
     public async Task<Guid> CreateCategoryAsync(Guid tableId, string categoryName)
     {

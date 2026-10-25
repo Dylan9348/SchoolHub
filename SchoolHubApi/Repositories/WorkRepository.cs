@@ -47,8 +47,8 @@ public class WorkRepository(Context database) : IWorkRepository
         return work.Id;
     }
 
-    public async Task<Work?> GetWorkAsync(Guid id) =>
+    public async Task<Work?> GetWorkAsync(Guid id, CancellationToken ct = default) =>
         await _database.Works
             .AsNoTracking()
-            .FirstOrDefaultAsync(w => w.Id == id);
+            .FirstOrDefaultAsync(w => w.Id == id, ct);
 }
