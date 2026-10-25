@@ -14,6 +14,6 @@ public class SchoolHubUser
     public ICollection<School> Schools { get; set; } = [];
     public ICollection<TableMember> Memberships { get; set; } = [];
     public ICollection<Table> OwnTables { get; set; } = [];
-    public ICollection<TableMessage> TableMessages { get; set; } = [];
+    public ICollection<TableMessage> SentMessages { get; set; } = [];
     public ICollection<Work> Works { get; set; } = [];
 }

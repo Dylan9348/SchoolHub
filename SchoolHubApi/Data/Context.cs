@@ -80,9 +80,9 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
             .IsUnique();
 
         modelBuilder.Entity<TableMessage>()
-            .HasOne(m => m.Table)
-            .WithMany(t => t.Messages)
-            .HasForeignKey(m => m.TableId)
+            .HasOne(m => m.Category)
+            .WithMany(c => c.Messages)
+            .HasForeignKey(m => m.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<TableMessage>()
@@ -93,7 +93,7 @@ public class Context(DbContextOptions<Context> options) : DbContext(options)
         
         modelBuilder.Entity<TableMessage>()
             .HasOne(m => m.Sender)
-            .WithMany(m => m.TableMessages)
+            .WithMany(m => m.SentMessages)
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Cascade);
 

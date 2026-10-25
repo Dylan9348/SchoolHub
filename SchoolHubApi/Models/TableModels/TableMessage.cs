@@ -10,8 +10,8 @@ public class TableMessage
     public DateOnly Date { get; set; }
     public Guid WorkId { get; set; }
     public Work Work { get; set; } = null!;
-    public Guid TableId { get; set; }
-    public Table Table { get; set; } = null!;
+    public Guid CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
     public bool Pending { get; set; } = true;
     public Guid SenderId { get; set; }
     public SchoolHubUser Sender { get; set; } = null!;

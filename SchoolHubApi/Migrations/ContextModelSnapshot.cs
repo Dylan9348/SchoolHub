@@ -332,7 +332,10 @@ namespace SchoolHubApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CategoryId")
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId1")
                         .HasColumnType("uuid");
 
                     b.Property<DateOnly>("Date")
@@ -344,7 +347,7 @@ namespace SchoolHubApi.Migrations
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("TableId")
+                    b.Property<Guid?>("TableMemberId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("WorkId")
@@ -354,9 +357,11 @@ namespace SchoolHubApi.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("CategoryId1");
+
                     b.HasIndex("SenderId");
 
-                    b.HasIndex("TableId");
+                    b.HasIndex("TableMemberId");
 
                     b.HasIndex("WorkId");
 
@@ -609,19 +614,24 @@ namespace SchoolHubApi.Migrations
                     b.HasOne("SchoolHubApi.Models.TableModels.Category", null)
                         .WithMany("Messages")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolHubApi.Models.TableModels.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SchoolHubApi.Models.UserModels.SchoolHubUser", "Sender")
-                        .WithMany("TableMessages")
+                        .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SchoolHubApi.Models.TableModels.Table", "Table")
+                    b.HasOne("SchoolHubApi.Models.TableModels.TableMember", null)
                         .WithMany("Messages")
-                        .HasForeignKey("TableId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TableMemberId");
 
                     b.HasOne("SchoolHubApi.Models.WorkModels.Work", "Work")
                         .WithMany()
@@ -629,9 +639,9 @@ namespace SchoolHubApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Sender");
+                    b.Navigation("Category");
 
-                    b.Navigation("Table");
+                    b.Navigation("Sender");
 
                     b.Navigation("Work");
                 });
@@ -725,7 +735,10 @@ namespace SchoolHubApi.Migrations
                     b.Navigation("Categories");
 
                     b.Navigation("Members");
+                });
 
+            modelBuilder.Entity("SchoolHubApi.Models.TableModels.TableMember", b =>
+                {
                     b.Navigation("Messages");
                 });
 
@@ -737,7 +750,7 @@ namespace SchoolHubApi.Migrations
 
                     b.Navigation("Schools");
 
-                    b.Navigation("TableMessages");
+                    b.Navigation("SentMessages");
 
                     b.Navigation("Works");
                 });

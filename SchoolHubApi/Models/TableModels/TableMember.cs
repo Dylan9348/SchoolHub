@@ -12,4 +12,5 @@ public class TableMember
     public Guid UserId { get; set; }
     public SchoolHubUser User { get; set; } = null!;
     public TableRole Role { get; set; } = TableRole.Member;
+    public ICollection<TableMessage> Messages { get; set; } = [];
 }
