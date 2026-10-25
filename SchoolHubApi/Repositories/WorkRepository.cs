@@ -51,4 +51,7 @@ public class WorkRepository(Context database) : IWorkRepository
         await _database.Works
             .AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == id, ct);
+
+    public async Task<bool> WorkExistAsync(Guid id, CancellationToken ct = default) =>
+        await _database.Works.AnyAsync(w => w.Id == id, ct);
 }
