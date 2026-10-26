@@ -20,6 +20,8 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         if (User.GetUserId() is null)
             return Unauthorized("Invalid Claim");
 
+        // FIX: this never verifies when the user is a member of the table, or if they are an admin or owner
+
         var result = await _categoryService.CreateCategoryAsync(req);
 
         return result.ToActionResult();
@@ -27,6 +29,4 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     
     [HttpDelete("{categoryId:guid}")]
     public async Task<IActionResult> DeleteCategory(Guid categoryId) => StatusCode(StatusCodes.Status501NotImplemented);
-    
-    public async Task<IActionResult> SendMessage() => StatusCode(StatusCodes.Status501NotImplemented);    
 }
