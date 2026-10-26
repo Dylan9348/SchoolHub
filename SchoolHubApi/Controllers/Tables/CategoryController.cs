@@ -17,16 +17,13 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     [HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto req)
     {
-        if (User.GetUserId() is null)
+        var userId = User.GetUserId();
+
+        if (userId is null)
             return Unauthorized("Invalid Claim");
 
-        // FIX: this never verifies when the user is a member of the table, or if they are an admin or owner
-
-        var result = await _categoryService.CreateCategoryAsync(req);
+        var result = await _categoryService.CreateCategoryAsync(userId.Value, req);
 
         return result.ToActionResult();
     }
-    
-    [HttpDelete("{categoryId:guid}")]
-    public async Task<IActionResult> DeleteCategory(Guid categoryId) => StatusCode(StatusCodes.Status501NotImplemented);
 }
