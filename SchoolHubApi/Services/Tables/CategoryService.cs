@@ -13,9 +13,9 @@ public class CategoryService(
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
     private readonly CategoryValidator _categoryValidator = categoryValidator;
 
-    public async Task<Result> CreateCategoryAsync(CreateCategoryDto category)
+    public async Task<Result> CreateCategoryAsync(Guid userId, CreateCategoryDto category)
     {
-        var validationResult = await _categoryValidator.ValidateCategoryCreation(category.TableId, category.CategoryName);
+        var validationResult = await _categoryValidator.ValidateCategoryCreation(userId, category.TableId, category.CategoryName);
 
         if (validationResult.IsFailed)
             return validationResult;
