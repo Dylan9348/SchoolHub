@@ -43,6 +43,8 @@ public static class ResultExtension
     public static int ToStatusCode(this IError error) => error switch
     {
         NotFoundError => StatusCodes.Status404NotFound,
+        ForbiddenError => StatusCodes.Status403Forbidden,
+        UnauthorizedError => StatusCodes.Status401Unauthorized,
         ConflictError => StatusCodes.Status409Conflict,
         AlreadyTakenError => StatusCodes.Status409Conflict,
         _ => StatusCodes.Status400BadRequest
@@ -51,6 +53,8 @@ public static class ResultExtension
     public static string ToTitle(this IError error) => error.ToStatusCode() switch
     {
         StatusCodes.Status404NotFound => "Not Found",
+        StatusCodes.Status403Forbidden => "Forbidden",
+        StatusCodes.Status401Unauthorized => "Unauthorized",
         StatusCodes.Status409Conflict => "Conflict",
         _ => "Bad Request"
     };
