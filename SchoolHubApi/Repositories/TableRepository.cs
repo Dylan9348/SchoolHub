@@ -58,6 +58,19 @@ public class TableRepository(
             .Select(m => (TableRole?)m.Role)
             .FirstOrDefaultAsync(ct);
 
+    public async Task ChangeRoleAsync(Guid memberId, TableRole newRole, CancellationToken ct = default)
+    {
+        var member = await _database.TableMembers
+            .SingleOrDefaultAsync(m => m.Id == memberId, ct);
+
+        if (member is null)
+            return;
+
+        member.Role = newRole;
+
+        await _database.SaveChangesAsync(ct);
+    }
+
     public async Task<bool> AddMemberAsync(Guid userId, Guid tableId, CancellationToken ct)
     {
         var tableExists = await _database.Tables.AnyAsync(t => t.Id == tableId, ct);

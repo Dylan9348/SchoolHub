@@ -13,5 +13,6 @@ public interface ITableRepository
     Task<Table?> GetTableAsync(string owner, string tableName);
     Task<bool> IsMemberAsync(Guid userId, Guid tableId, CancellationToken ct = default);
     Task<TableRole?> GetMemberRoleAsync(Guid userId, Guid tableId, CancellationToken ct = default);
+    Task ChangeRoleAsync(Guid memberId, TableRole newRole, CancellationToken ct = default);
     Task<bool> AddMemberAsync(Guid userId, Guid tableId, CancellationToken ct);
 }
