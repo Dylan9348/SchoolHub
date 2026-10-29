@@ -28,7 +28,7 @@ public class CategoryValidator(
         if (table.OwnerId != userId)
             return Result.Fail(new ForbiddenError("userId", "User is not the owner of the table."));
 
-        var nameAlreadyTaken = await _categoryRepository.CategoryExist(tableId, categoryName);
+        var nameAlreadyTaken = await _categoryRepository.CategoryExistAsync(tableId, categoryName);
 
         if (nameAlreadyTaken)
             return Result.Fail(new AlreadyTakenError("name", $"A category with the name '{categoryName}' already exists in that table"));

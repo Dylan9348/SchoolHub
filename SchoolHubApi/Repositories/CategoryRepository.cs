@@ -29,6 +29,6 @@ public class CategoryRepository(Context database) : ICategoryRepository
         return category.Id;
     }
 
-    public async Task<bool> CategoryExist(Guid tableId, string categoryName) => 
+    public async Task<bool> CategoryExistAsync(Guid tableId, string categoryName) => 
         await _database.TableCategories.AnyAsync(c => c.TableId == tableId && c.CategoryName == categoryName);
 }
