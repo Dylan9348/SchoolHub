@@ -46,7 +46,6 @@ public static class ResultExtension
         ForbiddenError => StatusCodes.Status403Forbidden,
         UnauthorizedError => StatusCodes.Status401Unauthorized,
         ConflictError => StatusCodes.Status409Conflict,
-        AlreadyTakenError => StatusCodes.Status409Conflict,
         _ => StatusCodes.Status400BadRequest
     };
 
