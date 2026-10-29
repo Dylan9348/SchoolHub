@@ -1,6 +1,6 @@
 
 using FluentResults;
-using SchoolHubApi.Enums;
+using SchoolHubApi.Models.SchoolModels.Permissions;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Results;
 
@@ -8,11 +8,13 @@ namespace SchoolHubApi.Validators;
 
 public class TableValidator(
     ITableRepository tableRepository,
-    IUserRepository userRepository
+    IUserRepository userRepository,
+    IMemberRepository memberRepository
 )
 {
     private readonly ITableRepository _tableRepository = tableRepository;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IMemberRepository _memberRepository = memberRepository;
 
     private const int MinTableNameLength = 2;
     private const int MaxTableNameLength = 50;
@@ -41,6 +43,19 @@ public class TableValidator(
 
         if (await _tableRepository.IsMemberAsync(userId, tableId, ct))
             return Result.Fail(new ConflictError("userId", "User is already a member of the table."));
+
+        return Result.Ok();
+    }
+
+    public async Task<Result> ValidateRoleAssignmentAsync(Guid memberId, CancellationToken ct = default)
+    {
+        var memberRole = await _memberRepository.GetRoleByIdAsync(memberId, ct);
+
+        if (memberRole is null)
+            return Result.Fail(new NotFoundError("memberId", "Member not found."));
+
+        if (memberRole is TableRole.Admin or TableRole.Owner)
+            return Result.Fail(new ConflictError("memberId", "Member is already an admin of the table."));
 
         return Result.Ok();
     }
