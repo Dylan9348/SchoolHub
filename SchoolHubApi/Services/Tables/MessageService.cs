@@ -54,9 +54,9 @@ public class MessageService(
         return Result.Ok();
     }
 
-    public async Task<Result<ICollection<MessageDto>>> GetMessagesAsync(GetMessagesQueryDto query, CancellationToken ct = default)
+    public async Task<Result<ICollection<MessageDto>>> GetMessagesAsync(Guid userId, GetMessagesQueryDto query, CancellationToken ct = default)
     {
-        var validationResult = _messageValidator.ValidateGetMessagesQuery(query);
+        var validationResult = await _messageValidator.ValidateGetMessagesQueryAsync(userId, query, ct);
 
         if (validationResult.IsFailed)
             return Result.Fail<ICollection<MessageDto>>(validationResult.Errors);
