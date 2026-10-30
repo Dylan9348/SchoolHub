@@ -12,4 +12,17 @@ public static class ToDtoExtension
 
         return dto;
     }
+
+    public static MessageDto ToDto(this TableMessage message)
+    {
+        var dto = new MessageDto(
+            message.Id,
+            message.Date,
+            message.CategoryId,
+            message.Sender.Username,
+            message.Pending,
+            new WorkDto(message.Work.Id, message.Work.Title, message.Work.Date));
+
+        return dto;
+    }
 }
