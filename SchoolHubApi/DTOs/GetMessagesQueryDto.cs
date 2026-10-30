@@ -1,7 +1,6 @@
 namespace SchoolHubApi.DTOs;
 
 public record GetMessagesQueryDto(
-    Guid CategoryId,
     ushort PageSize,
     ushort Page,
     DateOnly? AfterTo = null,

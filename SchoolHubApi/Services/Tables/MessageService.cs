@@ -54,14 +54,14 @@ public class MessageService(
         return Result.Ok();
     }
 
-    public async Task<Result<ICollection<MessageDto>>> GetMessagesAsync(Guid userId, GetMessagesQueryDto query, CancellationToken ct = default)
+    public async Task<Result<ICollection<MessageDto>>> GetMessagesAsync(Guid userId, Guid categoryId, GetMessagesQueryDto query, CancellationToken ct = default)
     {
-        var validationResult = await _messageValidator.ValidateGetMessagesQueryAsync(userId, query, ct);
+        var validationResult = await _messageValidator.ValidateGetMessagesQueryAsync(userId, categoryId, query, ct);
 
         if (validationResult.IsFailed)
             return Result.Fail<ICollection<MessageDto>>(validationResult.Errors);
 
-        var messages = await _messageRepository.GetMessagesAsync(query, ct);
+        var messages = await _messageRepository.GetMessagesAsync(categoryId, query, ct);
 
         if (messages is null)
             return Result.Fail<ICollection<MessageDto>>(new NotFoundError("categoryId", "Category not found."));

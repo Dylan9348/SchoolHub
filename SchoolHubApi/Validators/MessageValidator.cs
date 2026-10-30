@@ -64,7 +64,7 @@ public class MessageValidator(
         return Result.Ok();
     }
 
-    public async Task<Result> ValidateGetMessagesQueryAsync(Guid userId, GetMessagesQueryDto query, CancellationToken ct = default)
+    public async Task<Result> ValidateGetMessagesQueryAsync(Guid userId, Guid categoryId, GetMessagesQueryDto query, CancellationToken ct = default)
     {
         if (query.PageSize == 0)
             return Result.Fail(new InvalidError("pageSize", "Page size can't be 0."));
@@ -86,7 +86,7 @@ public class MessageValidator(
         if (!await _userRepository.UserExistAsync(userId, ct))
             return Result.Fail(new NotFoundError("userId", "User not found."));
 
-        var category = await _categoryRepository.GetCategoryAsync(query.CategoryId, ct);
+        var category = await _categoryRepository.GetCategoryAsync(categoryId, ct);
 
         if (category is null)
             return Result.Fail(new NotFoundError("categoryId", "Category not found."));

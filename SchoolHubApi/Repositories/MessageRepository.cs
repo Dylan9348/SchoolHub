@@ -30,7 +30,7 @@ public class MessageRepository(Context database) : IMessageRepository
         return message.Id;
     }
 
-    public async Task<ICollection<TableMessage>?> GetMessagesAsync(GetMessagesQueryDto query, CancellationToken ct = default)
+    public async Task<ICollection<TableMessage>?> GetMessagesAsync(Guid categoryId, GetMessagesQueryDto query, CancellationToken ct = default)
     {
         var skip = query.PageSize * query.Page;
 
@@ -47,7 +47,7 @@ public class MessageRepository(Context database) : IMessageRepository
                 .OrderBy(m => m.Date)
                 .Skip(skip)
                 .Take(query.PageSize))
-            .SingleOrDefaultAsync(c => c.Id == query.CategoryId, ct);
+            .SingleOrDefaultAsync(c => c.Id == categoryId, ct);
 
 
         return category?.Messages;
