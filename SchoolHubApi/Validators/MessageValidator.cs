@@ -64,7 +64,7 @@ public class MessageValidator(
         return Result.Ok();
     }
 
-    public Result ValidateGetMessagesQuery(GetMessagesQueryDto query)
+    public async Task<Result> ValidateGetMessagesQueryAsync(Guid userId, GetMessagesQueryDto query, CancellationToken ct = default)
     {
         if (query.PageSize == 0)
             return Result.Fail(new InvalidError("pageSize", "Page size can't be 0."));
@@ -82,6 +82,25 @@ public class MessageValidator(
 
         if (query.SendedBy is "")
             return Result.Fail(new InvalidError("sendedBy", "SendedBy can't be an empty string."));
+
+        if (!await _userRepository.UserExistAsync(userId, ct))
+            return Result.Fail(new NotFoundError("userId", "User not found."));
+
+        var category = await _categoryRepository.GetCategoryAsync(query.CategoryId, ct);
+
+        if (category is null)
+            return Result.Fail(new NotFoundError("categoryId", "Category not found."));
+
+        if (!await _tableRepository.IsMemberAsync(userId, category.TableId, ct))
+            return Result.Fail(new ForbiddenError("userId", "User is not a member of the category's table."));
+
+        if (query.IsPending is not null)
+        {
+            var role = await _tableRepository.GetMemberRoleAsync(userId, category.TableId, ct);
+
+            if (role is null || role is not (TableRole.Owner or TableRole.Admin))
+                return Result.Fail(new ForbiddenError("isPending", "User is not an admin or owner of the category's table."));
+        }
 
         return Result.Ok();
     }
