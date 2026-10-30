@@ -1,5 +1,6 @@
 
 using FluentResults;
+using SchoolHubApi.DTOs;
 using SchoolHubApi.Models.SchoolModels.Permissions;
 using SchoolHubApi.Repositories;
 using SchoolHubApi.Results;
@@ -59,6 +60,28 @@ public class MessageValidator(
 
         if (role is null || role is not (TableRole.Owner or TableRole.Admin))
             return Result.Fail(new ForbiddenError("aproverId", "User is not an admin or owner of the message's table."));
+
+        return Result.Ok();
+    }
+
+    public Result ValidateGetMessagesQuery(GetMessagesQueryDto query)
+    {
+        if (query.PageSize == 0)
+            return Result.Fail(new InvalidError("pageSize", "Page size can't be 0."));
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        if (query.AfterTo > today)
+            return Result.Fail(new InvalidError("afterTo", "AfterTo can't be after today."));
+
+        if (query.AfterTo is not null && query.BeforeTo is not null && query.BeforeTo <= query.AfterTo)
+            return Result.Fail(new InvalidError("beforeTo", "BeforeTo can't be before or equal to AfterTo."));
+
+        if (query.Title is "")
+            return Result.Fail(new InvalidError("title", "Title can't be an empty string."));
+
+        if (query.SendedBy is "")
+            return Result.Fail(new InvalidError("sendedBy", "SendedBy can't be an empty string."));
 
         return Result.Ok();
     }
