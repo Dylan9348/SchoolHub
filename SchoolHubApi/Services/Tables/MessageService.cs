@@ -1,7 +1,10 @@
 
 using FluentResults;
+using SchoolHubApi.DTOs;
+using SchoolHubApi.Extensions;
 using SchoolHubApi.Models.SchoolModels.Permissions;
 using SchoolHubApi.Repositories;
+using SchoolHubApi.Results;
 using SchoolHubApi.Validators;
 
 namespace SchoolHubApi.Services.Tables;
@@ -49,5 +52,20 @@ public class MessageService(
             return result;
 
         return Result.Ok();
+    }
+
+    public async Task<Result<ICollection<MessageDto>>> GetMessagesAsync(GetMessagesQueryDto query, CancellationToken ct = default)
+    {
+        var validationResult = _messageValidator.ValidateGetMessagesQuery(query);
+
+        if (validationResult.IsFailed)
+            return Result.Fail<ICollection<MessageDto>>(validationResult.Errors);
+
+        var messages = await _messageRepository.GetMessagesAsync(query, ct);
+
+        if (messages is null)
+            return Result.Fail<ICollection<MessageDto>>(new NotFoundError("categoryId", "Category not found."));
+
+        return Result.Ok<ICollection<MessageDto>>([.. messages.Select(m => m.ToDto())]);
     }
 }
