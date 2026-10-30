@@ -43,4 +43,17 @@ public class MessageController(
 
         return result.ToActionResult();
     }
+
+    [HttpGet("{categoryId:guid}")]
+    public async Task<IActionResult> GetMessages([FromRoute] Guid categoryId, [FromQuery] GetMessagesQueryDto req, CancellationToken ct)
+    {
+        var userId = User.GetUserId();
+
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await _messageService.GetMessagesAsync((Guid)userId, categoryId, req, ct);
+
+        return result.ToActionResult();
+    }
 }
