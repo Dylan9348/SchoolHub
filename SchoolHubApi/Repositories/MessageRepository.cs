@@ -2,6 +2,7 @@
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using SchoolHubApi.Data;
+using SchoolHubApi.DTOs;
 using SchoolHubApi.Models.TableModels;
 using SchoolHubApi.Results;
 
@@ -29,24 +30,24 @@ public class MessageRepository(Context database) : IMessageRepository
         return message.Id;
     }
 
-    public async Task<ICollection<TableMessage>?> GetMessagesAsync(Guid categoryId, ushort pageSize, ushort page, DateOnly? afterTo = null, DateOnly? beforeTo = null, DateOnly? workDate = null, string? title = null, string? sendedBy = null, bool? isPending = null, CancellationToken ct = default)
+    public async Task<ICollection<TableMessage>?> GetMessagesAsync(GetMessagesQueryDto query, CancellationToken ct = default)
     {
-        var skip = pageSize * page;
+        var skip = query.PageSize * query.Page;
 
         var category = await _database.TableCategories
             .AsNoTracking()
             .Include(c => c.Messages
                 .Where(m =>
-                    (afterTo == null || m.Date > afterTo) &&
-                    (beforeTo == null || m.Date < beforeTo) &&
-                    (workDate == null || m.Work.Date == workDate) &&
-                    (title == null || m.Work.Title == title) &&
-                    (sendedBy == null || m.Sender.Username == sendedBy) &&
-                    (isPending == null || m.Pending == isPending))
+                    (query.AfterTo == null || m.Date > query.AfterTo) &&
+                    (query.BeforeTo == null || m.Date < query.BeforeTo) &&
+                    (query.WorkDate == null || m.Work.Date == query.WorkDate) &&
+                    (query.Title == null || m.Work.Title == query.Title) &&
+                    (query.SendedBy == null || m.Sender.Username == query.SendedBy) &&
+                    (query.IsPending == null || m.Pending == query.IsPending))
                 .OrderBy(m => m.Date)
                 .Skip(skip)
-                .Take(pageSize))
-            .SingleOrDefaultAsync(c => c.Id == categoryId, ct);
+                .Take(query.PageSize))
+            .SingleOrDefaultAsync(c => c.Id == query.CategoryId, ct);
 
 
         return category?.Messages;
