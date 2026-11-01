@@ -14,26 +14,26 @@ public class WorkService(
     private readonly IWorkRepository _workRepository = workRepository;
     private readonly WorkValidator _workValidator = workValidator;
 
-    public async Task<Result> CreateInstructionWorkAsync(CreateInstructionWorkDto work)
+    public async Task<Result> CreateInstructionWorkAsync(Guid creatorId, CreateInstructionWorkDto work)
     {
-        var validationResult = await _workValidator.ValidateWorkCreation(work.CreatorId);
+        var validationResult = await _workValidator.ValidateWorkCreation(creatorId);
 
         if (validationResult.IsFailed)
             return validationResult;
 
-        await _workRepository.CreateInstructionWorkAsync(work.CreatorId, work.Instruction, work.Title, work.MaxValue, work.IsHomework, work.Date);
+        await _workRepository.CreateInstructionWorkAsync(creatorId, work.Instruction, work.Title, work.MaxValue, work.IsHomework, work.Date);
 
         return Result.Ok();
     }
 
-    public async Task<Result> CreateQuizWorkAsync(CreateQuizWorkDto work)
+    public async Task<Result> CreateQuizWorkAsync(Guid creatorId, CreateQuizWorkDto work)
     {
-        var validationResult = await _workValidator.ValidateWorkCreation(work.CreatorId);
+        var validationResult = await _workValidator.ValidateWorkCreation(creatorId);
 
         if (validationResult.IsFailed)
             return validationResult;
 
-        await _workRepository.CreateQuizWorkAsync(work.CreatorId, work.Questions, work.Title, work.MaxValue, work.IsHomework, work.Date);
+        await _workRepository.CreateQuizWorkAsync(creatorId, work.Questions, work.Title, work.MaxValue, work.IsHomework, work.Date);
 
         return Result.Ok();
     }

@@ -2,7 +2,6 @@
 namespace SchoolHubApi.DTOs;
 
 public record CreateInstructionWorkDto(
-    Guid CreatorId,
     string Instruction,
     string Title,
     uint MaxValue = 0,

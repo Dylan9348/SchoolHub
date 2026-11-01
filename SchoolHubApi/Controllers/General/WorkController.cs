@@ -17,10 +17,10 @@ public class WorkController(IWorkService workService) : ControllerBase
     [HttpPost("instructions")]
     public async Task<IActionResult> CreateInstructionWork([FromBody] CreateInstructionWorkDto req)
     {
-        if (User.GetUserId() is null)
+        if (User.GetUserId() is not Guid userId)
             return Unauthorized("Invalid Claim");
 
-        var result = await _workService.CreateInstructionWorkAsync(req);
+        var result = await _workService.CreateInstructionWorkAsync(userId, req);
 
         return result.ToActionResult();
     }
@@ -28,10 +28,10 @@ public class WorkController(IWorkService workService) : ControllerBase
     [HttpPost("quiz")]
     public async Task<IActionResult> CreateQuizWork([FromBody] CreateQuizWorkDto req)
     {
-        if (User.GetUserId() is null)
+        if (User.GetUserId() is not Guid userId)
             return Unauthorized("Invalid Claim");
 
-        var result = await _workService.CreateQuizWorkAsync(req);
+        var result = await _workService.CreateQuizWorkAsync(userId, req);
 
         return result.ToActionResult();
     }
